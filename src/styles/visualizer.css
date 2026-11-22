@@ -1,0 +1,237 @@
+
+
+/* ========================================
+   ECHOPULSE - VISUALIZER
+======================================== */
+
+.visualizer-stage {
+  position: relative;
+  width: 100%;
+  height: 310px;
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      ellipse at 50% 45%,
+      rgba(111, 49, 177, 0.25) 0%,
+      transparent 48%
+    ),
+    radial-gradient(
+      ellipse at 85% 20%,
+      rgba(35, 205, 224, 0.12) 0%,
+      transparent 40%
+    ),
+    linear-gradient(
+      145deg,
+      #111a35 0%,
+      #0b1023 65%,
+      #100d25 100%
+    );
+}
+
+.visualizer-stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Barra superior */
+
+.visualizer-toolbar {
+  position: absolute;
+  top: 15px;
+  left: 18px;
+  right: 18px;
+  z-index: 2;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.visualizer-label {
+  color: #8d9fbe;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* Selector de modos */
+
+.visualizer-modes {
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+
+  background: rgba(7, 11, 27, 0.82);
+  border: 1px solid rgba(126, 117, 255, 0.2);
+  border-radius: 9px;
+
+  backdrop-filter: blur(12px);
+}
+
+.visualizer-modes button {
+  padding: 7px 11px;
+
+  border: 1px solid transparent;
+  border-radius: 6px;
+
+  background: transparent;
+  color: #9299b8;
+
+  font-size: 11px;
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.visualizer-modes button:hover {
+  color: #ffffff;
+  background: rgba(153, 92, 255, 0.12);
+}
+
+.visualizer-modes button.selected {
+  background: linear-gradient(
+    110deg,
+    rgba(153, 92, 255, 0.85),
+    rgba(104, 72, 232, 0.9)
+  );
+  border-color: rgba(193, 163, 255, 0.25);
+  color: #ffffff;
+
+  box-shadow:
+    0 0 12px rgba(153, 92, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Barra inferior */
+
+.visualizer-footer {
+  position: absolute;
+  bottom: 12px;
+  left: 18px;
+  right: 18px;
+
+  display: flex;
+  justify-content: space-between;
+
+  color: #68799f;
+  font-size: 9px;
+  letter-spacing: 1px;
+
+  pointer-events: none;
+}
+
+/* Responsive */
+
+@media (max-width: 600px) {
+  .visualizer-stage {
+    height: 240px;
+  }
+
+  .visualizer-toolbar {
+    top: 12px;
+    left: 10px;
+    right: 10px;
+  }
+
+  .visualizer-label {
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+
+  .visualizer-modes {
+    gap: 4px;
+    padding: 3px;
+  }
+
+  .visualizer-modes button {
+    padding: 6px 8px;
+    font-size: 10px;
+  }
+
+  .visualizer-footer {
+    left: 10px;
+    right: 10px;
+    bottom: 9px;
+    font-size: 8px;
+  }
+}
+
+@media (max-width: 380px) {
+  .visualizer-toolbar {
+    gap: 5px;
+  }
+
+  .visualizer-label {
+    font-size: 7px;
+    letter-spacing: 0.5px;
+  }
+
+  .visualizer-modes button {
+    padding: 5px 7px;
+    font-size: 9px;
+  }
+}
+
+/* ========================================
+   ECHOPULSE - SIX VISUALIZER MODES
+======================================== */
+
+.visualizer-modes {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  max-width: 100%;
+}
+
+.visualizer-modes button {
+  white-space: nowrap;
+}
+
+.visualizer-modes button.selected {
+  box-shadow:
+    0 0 12px rgba(153, 92, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Nebula y Aurora: transiciones de selección */
+.visualizer-modes button {
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.visualizer-modes button:active {
+  transform: scale(0.96);
+}
+
+@media (max-width: 600px) {
+  .visualizer-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .visualizer-modes {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .visualizer-modes button {
+    padding: 6px 8px;
+    font-size: 9px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .visualizer-modes button {
+    transition: none;
+  }
+}

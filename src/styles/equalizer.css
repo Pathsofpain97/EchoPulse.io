@@ -1,0 +1,453 @@
+
+
+/* ========================================
+   ECHOPULSE - EQUALIZER
+======================================== */
+
+.equalizer-panel {
+  --eq-accent: #35e7f2;
+  --eq-secondary: #995cff;
+  --eq-glow: rgba(53, 231, 242, 0.22);
+  --eq-soft: rgba(53, 231, 242, 0.09);
+  --eq-border: rgba(53, 231, 242, 0.22);
+
+  width: 100%;
+  padding: 20px;
+  margin-top: 20px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(22, 23, 48, 0.92),
+      rgba(13, 16, 36, 0.94)
+    );
+
+  border: 1px solid var(--eq-border);
+  border-radius: 15px;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.15),
+    0 0 18px var(--eq-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.025);
+
+  transition:
+    border-color 0.4s ease,
+    box-shadow 0.4s ease;
+}
+
+/* ========================================
+   COLORES SEGÚN PRESET
+======================================== */
+
+/* NORMAL - Cian eléctrico */
+
+.equalizer-panel[data-preset="Normal"] {
+  --eq-accent: #35e7f2;
+  --eq-secondary: #995cff;
+  --eq-glow: rgba(53, 231, 242, 0.2);
+  --eq-soft: rgba(53, 231, 242, 0.09);
+  --eq-border: rgba(53, 231, 242, 0.25);
+}
+
+/* POP - Magenta y rosa */
+
+.equalizer-panel[data-preset="Pop"] {
+  --eq-accent: #ed35d1;
+  --eq-secondary: #ff8acb;
+  --eq-glow: rgba(237, 53, 209, 0.24);
+  --eq-soft: rgba(237, 53, 209, 0.1);
+  --eq-border: rgba(237, 53, 209, 0.3);
+}
+
+/* ROCK - Rojo y naranja */
+
+.equalizer-panel[data-preset="Rock"] {
+  --eq-accent: #ff623e;
+  --eq-secondary: #ffad42;
+  --eq-glow: rgba(255, 98, 62, 0.24);
+  --eq-soft: rgba(255, 98, 62, 0.1);
+  --eq-border: rgba(255, 98, 62, 0.3);
+}
+
+/* BASS - Violeta y azul profundo */
+
+.equalizer-panel[data-preset="Bass"] {
+  --eq-accent: #765cff;
+  --eq-secondary: #35a9f2;
+  --eq-glow: rgba(118, 92, 255, 0.26);
+  --eq-soft: rgba(118, 92, 255, 0.11);
+  --eq-border: rgba(118, 92, 255, 0.32);
+}
+
+/* PERSONALIZADO - Paleta EchoPulse */
+
+.equalizer-panel[data-preset="Personalizado"] {
+  --eq-accent: #35e7f2;
+  --eq-secondary: #ed35d1;
+  --eq-glow: rgba(153, 92, 255, 0.25);
+  --eq-soft: rgba(153, 92, 255, 0.11);
+  --eq-border: rgba(153, 92, 255, 0.32);
+}
+
+/* ========================================
+   ENCABEZADO
+======================================== */
+
+.equalizer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.equalizer-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--eq-accent);
+
+  transition: color 0.4s ease;
+}
+
+.equalizer-title h2 {
+  font-size: 16px;
+  color: var(--color-text);
+}
+
+/* ========================================
+   BOTÓN RESET
+======================================== */
+
+.equalizer-reset {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+
+  background: var(--eq-soft);
+  border: 1px solid var(--eq-border);
+  color: var(--eq-accent);
+
+  border-radius: 7px;
+  font-size: 12px;
+  cursor: pointer;
+
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease,
+    color 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.2s ease;
+}
+
+.equalizer-reset:hover {
+  background: var(--eq-soft);
+  border-color: var(--eq-accent);
+  box-shadow: 0 0 12px var(--eq-glow);
+  transform: translateY(-1px);
+}
+
+/* ========================================
+   PRESETS
+======================================== */
+
+.equalizer-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.equalizer-presets button {
+  padding: 7px 13px;
+
+  border: 1px solid rgba(126, 117, 255, 0.17);
+  border-radius: 7px;
+
+  background: rgba(18, 23, 48, 0.9);
+  color: #9299b8;
+
+  font-size: 12px;
+  cursor: pointer;
+
+  transition:
+    background 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.2s ease;
+}
+
+.equalizer-presets button:hover {
+  background: var(--eq-soft);
+  border-color: var(--eq-accent);
+  color: #ffffff;
+}
+
+.equalizer-presets button.active {
+  background: linear-gradient(
+    110deg,
+    var(--eq-accent),
+    var(--eq-secondary)
+  );
+
+  border-color: var(--eq-accent);
+  color: #ffffff;
+
+  box-shadow:
+    0 0 14px var(--eq-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+
+  transform: translateY(-1px);
+}
+
+/* ========================================
+   SLIDERS
+======================================== */
+
+.equalizer-sliders {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 190px;
+}
+
+.equalizer-band {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.equalizer-value {
+  color: var(--eq-accent);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  transition: color 0.4s ease;
+}
+
+/* Control deslizante */
+
+.equalizer-band input {
+  appearance: none;
+  -webkit-appearance: none;
+
+  width: 100%;
+  height: 6px;
+
+  border-radius: 10px;
+  outline: none;
+
+  background: linear-gradient(
+    to right,
+    var(--eq-secondary) 0%,
+    var(--eq-accent) var(--slider-progress),
+    #29304b var(--slider-progress),
+    #29304b 100%
+  );
+
+  cursor: pointer;
+
+  transform: rotate(-90deg);
+  max-width: 100px;
+  margin: 35px 0;
+
+  transition: filter 0.3s ease;
+}
+
+.equalizer-band input:hover {
+  filter: brightness(1.3);
+}
+
+/* Chrome, Edge y Safari */
+
+.equalizer-band input::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+
+  width: 14px;
+  height: 14px;
+
+  border-radius: 50%;
+  background: var(--eq-accent);
+  border: 2px solid #ffffff;
+
+  box-shadow:
+    0 0 8px var(--eq-accent),
+    0 0 16px var(--eq-glow);
+
+  transition:
+    background 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* Firefox */
+
+.equalizer-band input::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+
+  border-radius: 50%;
+  background: var(--eq-accent);
+  border: 2px solid #ffffff;
+
+  box-shadow:
+    0 0 8px var(--eq-accent),
+    0 0 16px var(--eq-glow);
+}
+
+/* ========================================
+   INFORMACIÓN DE CADA BANDA
+======================================== */
+
+.equalizer-band-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.equalizer-band-info strong {
+  color: #e4e4f5;
+  font-size: 11px;
+}
+
+.equalizer-band-info span {
+  color: var(--eq-accent);
+  font-size: 10px;
+  transition: color 0.4s ease;
+}
+
+.equalizer-band-info p {
+  color: #8992b3;
+  font-size: 9px;
+  line-height: 1.4;
+  max-width: 110px;
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (max-width: 600px) {
+  .equalizer-panel {
+    padding: 14px;
+  }
+
+  .equalizer-sliders {
+    gap: 5px;
+  }
+
+  .equalizer-band-info strong {
+    font-size: 9px;
+  }
+
+  .equalizer-band-info p {
+    display: none;
+  }
+
+  .equalizer-band-info span {
+    font-size: 9px;
+  }
+
+  .equalizer-presets {
+    gap: 6px;
+  }
+
+  .equalizer-presets button {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 380px) {
+  .equalizer-panel {
+    padding: 12px;
+  }
+
+  .equalizer-sliders {
+    gap: 2px;
+  }
+
+  .equalizer-value {
+    font-size: 10px;
+  }
+
+  .equalizer-band-info strong {
+    font-size: 8px;
+  }
+
+  .equalizer-band-info span {
+    font-size: 8px;
+  }
+
+  .equalizer-presets button {
+    padding: 6px 8px;
+    font-size: 10px;
+  }
+}
+
+/* ========================================
+   ECHOPULSE - PALETAS COMPLETAS DEL EQ
+======================================== */
+
+/* ELECTRONIC - Azul eléctrico y violeta */
+.equalizer-panel[data-preset="Electronic"] {
+  --eq-accent: #a855f7;
+  --eq-secondary: #3155ff;
+  --eq-glow: rgba(168, 85, 247, 0.3);
+  --eq-soft: rgba(168, 85, 247, 0.12);
+  --eq-border: rgba(168, 85, 247, 0.35);
+}
+
+/* ACOUSTIC - Tonos cálidos y naturales */
+.equalizer-panel[data-preset="Acoustic"] {
+  --eq-accent: #e8b76a;
+  --eq-secondary: #8bc9a0;
+  --eq-glow: rgba(232, 183, 106, 0.24);
+  --eq-soft: rgba(232, 183, 106, 0.1);
+  --eq-border: rgba(232, 183, 106, 0.3);
+}
+
+/* JAZZ - Violeta y magenta */
+.equalizer-panel[data-preset="Jazz"] {
+  --eq-accent: #a45cff;
+  --eq-secondary: #ed35d1;
+  --eq-glow: rgba(164, 92, 255, 0.25);
+  --eq-soft: rgba(164, 92, 255, 0.1);
+  --eq-border: rgba(164, 92, 255, 0.3);
+}
+
+/* CLASSICAL - Azul y lavanda */
+.equalizer-panel[data-preset="Classical"] {
+  --eq-accent: #b6d9f5;
+  --eq-secondary: #c6b5f5;
+  --eq-glow: rgba(182, 217, 245, 0.23);
+  --eq-soft: rgba(182, 217, 245, 0.09);
+  --eq-border: rgba(182, 217, 245, 0.28);
+}
+
+/* VOCAL - Rosa y magenta */
+.equalizer-panel[data-preset="Vocal"] {
+  --eq-accent: #ff9bc8;
+  --eq-secondary: #ed35d1;
+  --eq-glow: rgba(255, 155, 200, 0.25);
+  --eq-soft: rgba(255, 155, 200, 0.1);
+  --eq-border: rgba(255, 155, 200, 0.3);
+}
+
+/* NIGHT - Azul nocturno y violeta */
+.equalizer-panel[data-preset="Night"] {
+  --eq-accent: #7954c9;
+  --eq-secondary: #354b9c;
+  --eq-glow: rgba(121, 84, 201, 0.26);
+  --eq-soft: rgba(121, 84, 201, 0.11);
+  --eq-border: rgba(121, 84, 201, 0.32);
+}

@@ -1,0 +1,1221 @@
+/* =========================================
+   ECHOPULSE - FULLSCREEN EXPERIENCE
+========================================= */
+
+/* =========================================
+   CONTENEDOR DE PANTALLA COMPLETA
+========================================= */
+
+.player-layout:fullscreen {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  height: 100%;
+  max-width: none;
+
+  margin: 0;
+  padding: 0;
+
+  overflow: hidden;
+  background: #080b18;
+}
+
+.player-layout:fullscreen > :not(.fullscreen-experience) {
+  display: none !important;
+}
+
+.player-layout:fullscreen .fullscreen-experience {
+  display: flex;
+}
+
+/* =========================================
+   EXPERIENCIA PRINCIPAL
+========================================= */
+
+.fullscreen-experience {
+  position: absolute;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+
+  padding: clamp(18px, 2.5vw, 36px);
+
+  overflow: hidden;
+
+  color: var(--color-text);
+
+  background:
+    radial-gradient(
+      ellipse at 50% 42%,
+      rgba(53, 231, 242, 0.09),
+      transparent 48%
+    ),
+    radial-gradient(
+      ellipse at 85% 15%,
+      rgba(153, 92, 255, 0.1),
+      transparent 38%
+    ),
+    #080b18;
+
+  box-sizing: border-box;
+}
+
+.fullscreen-experience * {
+  box-sizing: border-box;
+}
+
+/* =========================================
+   BARRA SUPERIOR
+========================================= */
+
+.fullscreen-topbar {
+  position: absolute;
+  top: clamp(18px, 2.5vw, 36px);
+  left: clamp(18px, 2.5vw, 36px);
+  right: clamp(18px, 2.5vw, 36px);
+
+  z-index: 20;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  min-height: 42px;
+
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+.fullscreen-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  color: var(--color-cyan);
+
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.fullscreen-brand svg {
+  filter: drop-shadow(0 0 8px rgba(53, 231, 242, 0.5));
+}
+
+.fullscreen-exit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  width: 38px;
+  height: 38px;
+
+  color: var(--color-muted);
+  background: rgba(255, 255, 255, 0.04);
+
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  transition: all 0.25s ease;
+}
+
+.fullscreen-exit:hover {
+  color: var(--color-cyan);
+  border-color: var(--color-cyan);
+  background: rgba(53, 231, 242, 0.09);
+  box-shadow: 0 0 15px rgba(53, 231, 242, 0.12);
+}
+
+/* =========================================
+   ZONA PRINCIPAL
+========================================= */
+
+.fullscreen-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(210px, 245px);
+
+  align-items: stretch;
+  gap: clamp(20px, 3vw, 42px);
+
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+
+  padding: 65px 0 20px;
+
+  transition:
+    padding 0.4s ease;
+}
+
+/* Cuando aparecen los controles, reservamos espacio abajo */
+
+.fullscreen-experience.controls-visible .fullscreen-main {
+  padding-bottom: 215px;
+}
+
+/* =========================================
+   VISUALIZADOR
+========================================= */
+
+.fullscreen-visualizer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow: hidden;
+}
+
+.fullscreen-visualizer .visualizer-stage {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
+
+  padding: 0;
+
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.fullscreen-visualizer .visualizer-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+
+  flex-shrink: 0;
+
+  gap: 15px;
+  max-height: 80px;
+
+  padding: 5px 0 17px;
+
+  overflow: hidden;
+
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease,
+    max-height 0.35s ease,
+    padding 0.35s ease;
+}
+
+.fullscreen-visualizer .visualizer-toolbar > span {
+  color: var(--color-muted);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+}
+
+.fullscreen-visualizer .visualizer-modes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.fullscreen-visualizer .visualizer-modes button {
+  padding: 8px 12px;
+
+  color: var(--color-muted);
+  background: rgba(255, 255, 255, 0.035);
+
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+
+  font-size: 11px;
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.fullscreen-visualizer .visualizer-modes button:hover {
+  color: var(--color-cyan);
+  border-color: rgba(53, 231, 242, 0.5);
+}
+
+.fullscreen-visualizer .visualizer-modes button.selected {
+  color: var(--color-cyan);
+  background: rgba(53, 231, 242, 0.1);
+  border-color: var(--color-cyan);
+  box-shadow: 0 0 13px rgba(53, 231, 242, 0.12);
+}
+
+.fullscreen-visualizer canvas {
+  display: block;
+
+  flex: 1;
+
+  width: 100%;
+  height: 100%;
+
+  min-height: 0;
+  min-width: 0;
+}
+
+.fullscreen-visualizer .visualizer-footer {
+  display: flex;
+  justify-content: space-between;
+
+  flex-shrink: 0;
+
+  padding-top: 12px;
+}
+
+/* =========================================
+   PANEL NOW PLAYING
+========================================= */
+
+.fullscreen-now-playing {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+
+  min-width: 0;
+
+  padding: 25px 0 25px 26px;
+
+  border-left: 1px solid rgba(126, 117, 255, 0.22);
+}
+
+.fullscreen-eyebrow {
+  color: var(--color-cyan);
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+}
+
+.fullscreen-track-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 68px;
+  height: 68px;
+
+  margin: 22px 0;
+
+  color: var(--color-cyan);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(53, 231, 242, 0.15),
+      rgba(153, 92, 255, 0.18)
+    );
+
+  border: 1px solid rgba(53, 231, 242, 0.25);
+  border-radius: 19px;
+
+  box-shadow: 0 0 35px rgba(53, 231, 242, 0.08);
+}
+
+.fullscreen-now-playing h2 {
+  width: 100%;
+  margin: 0;
+
+  color: var(--color-text);
+
+  font-size: clamp(17px, 1.7vw, 23px);
+  line-height: 1.35;
+
+  overflow-wrap: anywhere;
+}
+
+.fullscreen-now-playing p {
+  margin: 9px 0 20px;
+
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.fullscreen-track-status {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  color: var(--color-muted);
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.fullscreen-track-status span {
+  width: 7px;
+  height: 7px;
+
+  background: var(--color-muted);
+  border-radius: 50%;
+}
+
+.fullscreen-track-status .status-playing {
+  background: var(--color-cyan);
+  box-shadow: 0 0 10px var(--color-cyan);
+}
+
+/* =========================================
+   PANEL FLOTANTE DE CONTROLES
+========================================= */
+
+.fullscreen-controls {
+  position: absolute;
+  left: clamp(18px, 2.5vw, 36px);
+  right: clamp(18px, 2.5vw, 36px);
+  bottom: clamp(18px, 2.5vw, 36px);
+
+  z-index: 25;
+
+  display: grid;
+  grid-template-columns: minmax(230px, 0.85fr) minmax(0, 1.15fr);
+
+  align-items: center;
+  gap: 25px;
+
+  width: auto;
+  min-width: 0;
+
+  padding: 15px 19px;
+
+  background: rgba(12, 15, 34, 0.92);
+
+  border: 1px solid rgba(126, 117, 255, 0.22);
+  border-radius: 15px;
+
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.25),
+    0 0 25px rgba(53, 231, 242, 0.035);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transform: translateY(18px);
+
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease,
+    visibility 0.35s ease;
+}
+
+.fullscreen-experience.controls-visible .fullscreen-controls {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+
+  transform: translateY(0);
+}
+
+/* =========================================
+   REPRODUCCIÓN
+========================================= */
+
+.fullscreen-playback {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  gap: 15px;
+  min-width: 0;
+}
+
+.fullscreen-progress {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 38px;
+
+  align-items: center;
+  gap: 9px;
+
+  color: var(--color-muted);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.fullscreen-progress input,
+.fullscreen-volume input {
+  width: 100%;
+  min-width: 0;
+
+  accent-color: var(--color-cyan);
+  cursor: pointer;
+}
+
+.fullscreen-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.fullscreen-buttons button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  width: 36px;
+  height: 36px;
+
+  color: var(--color-muted);
+  background: transparent;
+
+  border: none;
+  border-radius: 50%;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fullscreen-buttons button:hover:not(:disabled) {
+  color: var(--color-cyan);
+  background: rgba(53, 231, 242, 0.08);
+}
+
+.fullscreen-buttons button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.fullscreen-buttons .fullscreen-play-button {
+  width: 44px;
+  height: 44px;
+
+  color: #080b18;
+  background: var(--color-cyan);
+
+  box-shadow: 0 0 20px rgba(53, 231, 242, 0.25);
+}
+
+.fullscreen-buttons .fullscreen-play-button:hover:not(:disabled) {
+  color: #080b18;
+  background: #75f2f7;
+
+  box-shadow: 0 0 26px rgba(53, 231, 242, 0.45);
+}
+
+.fullscreen-volume {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  width: 110px;
+  margin-left: 8px;
+
+  color: var(--color-muted);
+}
+
+/* =========================================
+   ECUALIZADOR COMPACTO
+========================================= */
+
+.fullscreen-equalizer {
+  width: 100%;
+  min-width: 0;
+  max-height: 150px;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(53, 231, 242, 0.3) transparent;
+}
+
+.fullscreen-equalizer .equalizer-panel {
+  width: 100%;
+  margin: 0;
+  padding: 9px 12px;
+
+  background: rgba(8, 11, 24, 0.38);
+  border: 1px solid rgba(126, 117, 255, 0.12);
+
+  box-shadow: none;
+}
+
+.fullscreen-equalizer .equalizer-header {
+  margin-bottom: 8px;
+}
+
+.fullscreen-equalizer .equalizer-title {
+  gap: 7px;
+}
+
+.fullscreen-equalizer .equalizer-title h2 {
+  font-size: 12px;
+}
+
+.fullscreen-equalizer .equalizer-title svg {
+  width: 15px;
+}
+
+.fullscreen-equalizer .equalizer-reset {
+  padding: 5px 8px;
+  font-size: 10px;
+}
+
+.fullscreen-equalizer .equalizer-presets {
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.fullscreen-equalizer .equalizer-presets button {
+  padding: 5px 8px;
+  font-size: 10px;
+}
+
+.fullscreen-equalizer .equalizer-sliders {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.fullscreen-equalizer .equalizer-band {
+  min-width: 0;
+}
+
+.fullscreen-equalizer .equalizer-band input {
+  width: 100%;
+  min-width: 0;
+}
+
+.fullscreen-equalizer .equalizer-value {
+  font-size: 10px;
+}
+
+.fullscreen-equalizer .equalizer-band-info {
+  margin-top: 5px;
+}
+
+.fullscreen-equalizer .equalizer-band-info strong {
+  font-size: 10px;
+}
+
+.fullscreen-equalizer .equalizer-band-info span {
+  font-size: 9px;
+}
+
+.fullscreen-equalizer .equalizer-band-info p {
+  display: none;
+}
+
+/* =========================================
+   INDICACIÓN DE SALIDA
+========================================= */
+
+.fullscreen-hint {
+  position: absolute;
+  top: 78px;
+  left: 50%;
+  z-index: 12;
+
+  color: rgba(244, 244, 255, 0.65);
+
+  font-size: 11px;
+  letter-spacing: 0.04em;
+
+  transform: translateX(-50%);
+
+  pointer-events: none;
+
+  animation: fullscreen-hint-fade 3.5s ease forwards;
+}
+
+@keyframes fullscreen-hint-fade {
+  0%, 45% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+/* =========================================
+   OCULTAMIENTO DE ELEMENTOS
+========================================= */
+
+.fullscreen-experience:not(.controls-visible) .fullscreen-topbar {
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+}
+
+.fullscreen-experience:not(.controls-visible) .fullscreen-visualizer .visualizer-toolbar {
+  opacity: 0;
+  transform: translateY(-8px);
+
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+
+  pointer-events: none;
+}
+
+/* =========================================
+   RESPONSIVE - PANTALLAS MEDIANAS
+========================================= */
+
+@media (max-width: 1000px) {
+  .fullscreen-main {
+    grid-template-columns: minmax(0, 1fr) 200px;
+    gap: 18px;
+  }
+
+  .fullscreen-now-playing {
+    padding-left: 18px;
+  }
+
+  .fullscreen-controls {
+    grid-template-columns: minmax(190px, 0.8fr) minmax(0, 1.2fr);
+    gap: 15px;
+    padding: 12px;
+  }
+
+  .fullscreen-volume {
+    width: 85px;
+  }
+
+  .fullscreen-equalizer .equalizer-panel {
+    padding: 8px;
+  }
+}
+
+/* =========================================
+   RESPONSIVE - TABLETS Y MÓVILES
+========================================= */
+
+@media (max-width: 700px) {
+  .fullscreen-experience {
+    padding: 12px;
+  }
+
+  .fullscreen-topbar {
+    top: 12px;
+    left: 12px;
+    right: 12px;
+  }
+
+  .fullscreen-main {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+
+    gap: 10px;
+    padding: 55px 0 10px;
+  }
+
+  .fullscreen-experience.controls-visible .fullscreen-main {
+    padding-bottom: 42vh;
+  }
+
+  .fullscreen-visualizer {
+    min-height: 0;
+  }
+
+  .fullscreen-visualizer .visualizer-toolbar {
+    justify-content: center;
+    gap: 9px;
+    padding-bottom: 10px;
+  }
+
+  .fullscreen-visualizer .visualizer-modes {
+    justify-content: center;
+  }
+
+  .fullscreen-visualizer .visualizer-modes button {
+    padding: 6px 8px;
+    font-size: 10px;
+  }
+
+  .fullscreen-now-playing {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+
+    align-items: center;
+    column-gap: 12px;
+
+    padding: 9px 0;
+
+    border-left: none;
+    border-top: 1px solid rgba(126, 117, 255, 0.22);
+  }
+
+  .fullscreen-eyebrow {
+    grid-column: 1 / -1;
+    margin-bottom: 7px;
+  }
+
+  .fullscreen-track-icon {
+    grid-column: 1;
+    grid-row: 2 / 4;
+
+    width: 42px;
+    height: 42px;
+
+    margin: 0;
+    border-radius: 12px;
+  }
+
+  .fullscreen-track-icon svg {
+    width: 21px;
+  }
+
+  .fullscreen-now-playing h2 {
+    grid-column: 2;
+    grid-row: 2;
+    font-size: 14px;
+  }
+
+  .fullscreen-now-playing p {
+    grid-column: 2;
+    grid-row: 3;
+
+    margin: 3px 0 0;
+    font-size: 10px;
+  }
+
+  .fullscreen-track-status {
+    display: none;
+  }
+
+  .fullscreen-controls {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+
+    max-height: 38vh;
+    padding: 10px;
+
+    overflow-y: auto;
+  }
+
+  .fullscreen-playback {
+    gap: 8px;
+  }
+
+  .fullscreen-buttons {
+    gap: 8px;
+  }
+
+  .fullscreen-volume {
+    width: 85px;
+    margin-left: 3px;
+  }
+
+  .fullscreen-equalizer {
+    max-height: 115px;
+  }
+
+  .fullscreen-equalizer .equalizer-band-info p {
+    display: none;
+  }
+
+  .fullscreen-hint {
+    top: 58px;
+    font-size: 10px;
+  }
+}
+
+/* =========================================
+   RESPONSIVE - MÓVILES PEQUEÑOS
+========================================= */
+
+@media (max-width: 400px) {
+  .fullscreen-brand {
+    font-size: 14px;
+  }
+
+  .fullscreen-main {
+    gap: 6px;
+  }
+
+  .fullscreen-visualizer .visualizer-modes {
+    gap: 4px;
+  }
+
+  .fullscreen-visualizer .visualizer-modes button {
+    padding: 5px 6px;
+    font-size: 9px;
+  }
+
+  .fullscreen-controls {
+    padding: 8px;
+  }
+
+  .fullscreen-progress {
+    grid-template-columns: 33px minmax(0, 1fr) 33px;
+    gap: 6px;
+    font-size: 9px;
+  }
+
+  .fullscreen-volume {
+    width: 65px;
+  }
+
+  .fullscreen-equalizer .equalizer-presets button {
+    padding: 4px 5px;
+    font-size: 9px;
+  }
+
+  .fullscreen-equalizer .equalizer-band-info strong {
+    font-size: 8px;
+  }
+}
+
+/* =========================================
+   ACCESIBILIDAD
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .fullscreen-experience *,
+  .fullscreen-experience *::before,
+  .fullscreen-experience *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* =========================================
+   ECHOPULSE - FULLSCREEN MUSIC LIBRARY
+========================================= */
+
+.fullscreen-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fullscreen-library-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  min-height: 38px;
+  padding: 0 12px;
+
+  color: var(--color-muted);
+  background: rgba(255, 255, 255, 0.04);
+
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+
+  font-size: 11px;
+  cursor: pointer;
+
+  transition: all 0.25s ease;
+}
+
+.fullscreen-library-toggle:hover,
+.fullscreen-library-toggle.active {
+  color: var(--color-cyan);
+  background: rgba(53, 231, 242, 0.09);
+  border-color: rgba(53, 231, 242, 0.55);
+  box-shadow: 0 0 15px rgba(53, 231, 242, 0.1);
+}
+
+.fullscreen-library-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+
+  color: #080b18;
+  background: var(--color-cyan);
+
+  border-radius: 20px;
+
+  font-size: 9px;
+  font-weight: 700;
+}
+
+/* Panel lateral */
+
+.fullscreen-library-panel {
+  position: absolute;
+  top: 88px;
+  right: clamp(18px, 2.5vw, 36px);
+  bottom: 165px;
+
+  z-index: 30;
+
+  display: flex;
+  flex-direction: column;
+
+  width: min(360px, calc(100% - 36px));
+  min-height: 0;
+
+  padding: 20px;
+
+  color: var(--color-text);
+  background: rgba(12, 15, 34, 0.96);
+
+  border: 1px solid rgba(126, 117, 255, 0.25);
+  border-radius: 16px;
+
+  box-shadow:
+    0 18px 55px rgba(0, 0, 0, 0.45),
+    0 0 30px rgba(53, 231, 242, 0.06);
+
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transform: translateX(25px);
+
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease,
+    visibility 0.3s ease;
+}
+
+.fullscreen-experience.library-open .fullscreen-library-panel {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+
+  transform: translateX(0);
+}
+
+.fullscreen-library-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+
+  flex-shrink: 0;
+
+  margin-bottom: 17px;
+}
+
+.fullscreen-library-header h2 {
+  margin-top: 7px;
+
+  color: var(--color-text);
+  font-size: 19px;
+}
+
+.fullscreen-library-header p {
+  margin-top: 5px;
+
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.fullscreen-library-header > button {
+  display: grid;
+  place-items: center;
+
+  flex-shrink: 0;
+
+  width: 32px;
+  height: 32px;
+
+  color: var(--color-muted);
+  background: rgba(255, 255, 255, 0.04);
+
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fullscreen-library-header > button:hover {
+  color: var(--color-cyan);
+  border-color: var(--color-cyan);
+  background: rgba(53, 231, 242, 0.08);
+}
+
+.fullscreen-add-music {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  flex-shrink: 0;
+
+  width: 100%;
+  padding: 11px;
+
+  color: #fff;
+  background: linear-gradient(110deg, #6848e8, #8249dc);
+
+  border: none;
+  border-radius: 9px;
+
+  font-size: 12px;
+  cursor: pointer;
+
+  box-shadow: 0 4px 16px rgba(112, 72, 232, 0.18);
+
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.fullscreen-add-music:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.12);
+  box-shadow: 0 6px 20px rgba(112, 72, 232, 0.3);
+}
+
+.fullscreen-library-search {
+  width: 100%;
+  margin-top: 13px;
+  flex-shrink: 0;
+}
+
+.fullscreen-library-list {
+  flex: 1;
+  min-height: 0;
+
+  margin-top: 13px;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(53, 231, 242, 0.3) transparent;
+}
+
+.fullscreen-library-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.fullscreen-library-list::-webkit-scrollbar-thumb {
+  background: rgba(53, 231, 242, 0.25);
+  border-radius: 10px;
+}
+
+.fullscreen-library-list .playlist-song {
+  gap: 8px;
+  padding: 11px 7px;
+}
+
+.fullscreen-library-list .song-select {
+  gap: 9px;
+}
+
+.fullscreen-library-list .song-select span {
+  font-size: 11px;
+}
+
+.fullscreen-library-list .playing-label {
+  font-size: 8px;
+}
+
+.fullscreen-library-list .empty-playlist {
+  min-height: 160px;
+}
+
+/* Cuando se abre la biblioteca, el Now Playing deja de competir
+   por el espacio: el panel lateral toma su lugar visual. */
+
+.fullscreen-experience.library-open .fullscreen-now-playing {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+/* Asegurar que el panel permanezca interactivo. */
+
+.fullscreen-experience.library-open .fullscreen-library-panel,
+.fullscreen-experience.library-open .fullscreen-topbar {
+  pointer-events: auto;
+}
+
+/* Responsive */
+
+@media (max-width: 700px) {
+  .fullscreen-topbar-actions {
+    gap: 6px;
+  }
+
+  .fullscreen-library-toggle {
+    min-height: 35px;
+    padding: 0 9px;
+    gap: 6px;
+    font-size: 10px;
+  }
+
+  .fullscreen-library-panel {
+    top: 62px;
+    right: 12px;
+    bottom: 12px;
+
+    width: min(340px, calc(100% - 24px));
+    padding: 15px;
+  }
+
+  .fullscreen-library-header h2 {
+    font-size: 17px;
+  }
+
+  .fullscreen-library-list .playlist-song {
+    padding: 10px 5px;
+  }
+}
+
+@media (max-width: 400px) {
+  .fullscreen-library-toggle {
+    padding: 0 7px;
+    gap: 5px;
+    font-size: 9px;
+  }
+
+  .fullscreen-library-toggle svg {
+    width: 15px;
+  }
+
+  .fullscreen-library-panel {
+    padding: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fullscreen-library-panel,
+  .fullscreen-library-toggle,
+  .fullscreen-add-music {
+    transition: none;
+  }
+}
