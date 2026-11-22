@@ -424,7 +424,7 @@ function Intro({ onComplete }) {
       />
 
       <div className="intro-brand">
-        <h1>EchoPulse</h1>
+        <h1>Echo Pulse</h1>
 
         <span>MUSIC PLAYER</span>
 
