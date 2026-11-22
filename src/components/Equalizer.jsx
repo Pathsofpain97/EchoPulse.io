@@ -1,33 +1,14 @@
 
 import { RotateCcw, SlidersHorizontal } from 'lucide-react';
+import { t } from './i18n/translations';
 import '../styles/equalizer.css';
 
-const bands = [
-  {
-    label: 'Graves',
-    frequency: '60 Hz',
-    description: 'Profundidad y golpes del bombo'
-  },
-  {
-    label: 'Bajos medios',
-    frequency: '250 Hz',
-    description: 'Cuerpo y calidez de la música'
-  },
-  {
-    label: 'Medios',
-    frequency: '1 kHz',
-    description: 'Voces e instrumentos principales'
-  },
-  {
-    label: 'Altos medios',
-    frequency: '4 kHz',
-    description: 'Claridad y definición'
-  },
-  {
-    label: 'Agudos',
-    frequency: '12 kHz',
-    description: 'Brillo y detalles del sonido'
-  }
+const frequencies = [
+  '60 Hz',
+  '250 Hz',
+  '1 kHz',
+  '4 kHz',
+  '12 kHz'
 ];
 
 const presets = {
@@ -47,7 +28,8 @@ function Equalizer({
   values,
   onChange,
   preset = 'Normal',
-  onPresetChange = () => {}
+  onPresetChange = () => {},
+  language = 'es'
 }) {
   const handlePreset = (name) => {
     onPresetChange(name);
@@ -68,49 +50,46 @@ function Equalizer({
     onChange([...presets.Normal]);
   };
 
+  const bands = t(language, 'bands');
+
   return (
     <section
       className="equalizer-panel"
       data-preset={preset}
     >
       <div className="equalizer-header">
-
         <div className="equalizer-title">
           <SlidersHorizontal size={19} />
-          <h2>Equalizer</h2>
+          <h2>{t(language, 'equalizer')}</h2>
         </div>
 
         <button
           className="equalizer-reset"
           onClick={resetEqualizer}
-          title="Reset equalizer"
+          title={t(language, 'reset')}
         >
           <RotateCcw size={15} />
-          Reset
+          {t(language, 'reset')}
         </button>
-
       </div>
 
       <div className="equalizer-presets">
-
         {Object.keys(presets).map(name => (
           <button
             key={name}
             className={preset === name ? 'active' : ''}
             onClick={() => handlePreset(name)}
           >
-            {name}
+            {t(language, `presets.${name}`)}
           </button>
         ))}
-
       </div>
 
       <div className="equalizer-sliders">
-
         {bands.map((band, index) => (
           <div
             className="equalizer-band"
-            key={band.frequency}
+            key={frequencies[index]}
           >
             <span className="equalizer-value">
               {values[index] > 0 ? '+' : ''}
@@ -135,13 +114,11 @@ function Equalizer({
 
             <div className="equalizer-band-info">
               <strong>{band.label}</strong>
-              <span>{band.frequency}</span>
+              <span>{frequencies[index]}</span>
               <p>{band.description}</p>
             </div>
-
           </div>
         ))}
-
       </div>
     </section>
   );

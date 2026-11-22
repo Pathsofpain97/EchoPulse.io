@@ -1054,3 +1054,480 @@
     box-shadow 0.4s ease;
 }
 
+
+/* ========================================
+   ECHOPULSE - LIBRARY NOTIFICATIONS
+======================================== */
+
+.library-notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  width: 100%;
+  padding: 11px 14px;
+  margin-top: 12px;
+
+  color: #35e7f2;
+  background: rgba(53, 231, 242, 0.08);
+
+  border: 1px solid rgba(53, 231, 242, 0.22);
+  border-radius: 10px;
+
+  font-size: 13px;
+  line-height: 1.4;
+
+  animation: libraryNoticeIn 0.25s ease;
+}
+
+.library-notice > svg {
+  flex-shrink: 0;
+}
+
+.library-notice > span {
+  flex: 1;
+}
+
+.library-notice button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 26px;
+  height: 26px;
+
+  padding: 0;
+
+  color: inherit;
+  background: transparent;
+  border: none;
+
+  border-radius: 6px;
+  cursor: pointer;
+
+  transition: background 0.2s ease;
+}
+
+.library-notice button:hover {
+  background: rgba(53, 231, 242, 0.15);
+}
+
+.library-notice.notice-info {
+  color: #a9b8ff;
+  background: rgba(101, 117, 255, 0.09);
+  border-color: rgba(101, 117, 255, 0.25);
+}
+
+.library-notice.notice-info button:hover {
+  background: rgba(101, 117, 255, 0.15);
+}
+
+@keyframes libraryNoticeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* ========================================
+   ECHOPULSE - LANGUAGE SELECTOR REDESIGN
+======================================== */
+
+.player-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.player-header-main {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  min-width: 0;
+}
+
+.player-brand {
+  flex-shrink: 0;
+}
+
+/* Selector de idioma */
+
+.language-selector {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  flex-shrink: 0;
+  padding: 5px;
+  background: rgba(12, 18, 38, 0.92);
+  border: 1px solid rgba(53, 231, 242, 0.22);
+  border-radius: 30px;
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.2),
+    inset 0 0 12px rgba(53, 231, 242, 0.025);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.language-selector button {
+  display: grid;
+  place-items: center;
+  min-width: 37px;
+  height: 30px;
+  padding: 0 9px;
+  color: #8993b2;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  cursor: pointer;
+  transition:
+    color 0.25s ease,
+    background 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+.language-selector button:hover {
+  color: #ffffff;
+  background: rgba(53, 231, 242, 0.08);
+}
+
+.language-selector button.active {
+  color: #07121f;
+  background: linear-gradient(120deg, #35e7f2, #8c9aff);
+  border-color: rgba(53, 231, 242, 0.55);
+  box-shadow:
+    0 0 12px rgba(53, 231, 242, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.language-selector button.active:hover {
+  color: #07121f;
+  transform: scale(1.04);
+}
+
+.language-divider {
+  color: rgba(137, 147, 178, 0.45);
+  font-size: 11px;
+  user-select: none;
+}
+
+/* ========================================
+   RESPONSIVE - LANGUAGE SELECTOR
+======================================== */
+
+@media (max-width: 600px) {
+  .player-header {
+    gap: 10px;
+  }
+
+  .player-header-main {
+    gap: 10px;
+  }
+
+  .language-selector {
+    padding: 4px;
+  }
+
+  .language-selector button {
+    min-width: 32px;
+    height: 27px;
+    padding: 0 7px;
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 380px) {
+  .player-header-main {
+    gap: 7px;
+  }
+
+  .player-status {
+    letter-spacing: 0.3px;
+    font-size: 7px;
+  }
+
+  .language-selector button {
+    min-width: 28px;
+    height: 25px;
+    padding: 0 5px;
+    font-size: 9px;
+  }
+}
+
+/* Accesibilidad */
+
+@media (prefers-reduced-motion: reduce) {
+  .language-selector button {
+    transition: none;
+  }
+}
+
+
+/* ========================================
+   ECHOPULSE - RESPONSIVE REFINEMENT
+   MOBILE AND SMALL SCREENS
+======================================== */
+
+.player-layout,
+.player-layout * {
+  box-sizing: border-box;
+}
+
+.player-layout {
+  min-width: 0;
+  overflow-x: clip;
+}
+
+.music-player,
+.playlist-panel,
+.visualizer-section,
+.visualizer-area,
+.current-track,
+.equalizer-panel {
+  min-width: 0;
+}
+
+@media (max-width: 600px) {
+  .player-layout {
+    padding: 18px 12px;
+  }
+
+  .player-header {
+    align-items: center;
+    margin-bottom: 18px;
+  }
+
+  .player-header-main {
+    min-width: 0;
+    flex-wrap: wrap;
+    row-gap: 3px;
+  }
+
+  .player-brand h1 {
+    font-size: clamp(19px, 5vw, 22px);
+  }
+
+  .player-brand svg {
+    width: 23px;
+    height: 23px;
+  }
+
+  .player-status {
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+
+  .music-player {
+    padding: 13px;
+    border-radius: 15px;
+  }
+
+  .visualizer-area {
+    min-height: clamp(190px, 55vw, 250px);
+  }
+
+  .fullscreen-launch-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 9px;
+  }
+
+  .fullscreen-launch-row > span {
+    flex: 1;
+    min-width: 130px;
+    line-height: 1.5;
+  }
+
+  .fullscreen-launch {
+    padding: 9px 10px;
+    font-size: 11px;
+  }
+
+  .current-track {
+    margin: 18px 0;
+  }
+
+  .current-track h2 {
+    font-size: 16px;
+  }
+
+  .current-track p {
+    font-size: 11px;
+  }
+
+  .track-progress {
+    gap: 7px;
+    font-size: 10px;
+  }
+
+  .player-controls {
+    margin: 17px 0;
+  }
+
+  .volume-control {
+    justify-content: center;
+  }
+
+  .playlist-panel {
+    margin-top: 17px;
+    padding: 13px;
+    border-radius: 15px;
+  }
+
+  .playlist-header {
+    align-items: center;
+  }
+
+  .playlist-header > div {
+    min-width: 0;
+  }
+
+  .playlist-header h2 {
+    font-size: 14px;
+  }
+
+  .library-toolbar {
+    gap: 9px;
+  }
+
+  .library-search {
+    min-height: 42px;
+  }
+
+  .playlist-content {
+    max-height: 350px;
+  }
+
+  .playlist-song {
+    min-width: 0;
+  }
+
+  .song-select {
+    overflow: hidden;
+  }
+
+  .song-select span {
+    min-width: 0;
+  }
+
+  .playing-label {
+    font-size: 8px;
+    letter-spacing: 0;
+  }
+
+  .library-notice {
+    padding: 9px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 380px) {
+  .player-layout {
+    padding: 14px 8px;
+  }
+
+  .player-header {
+    gap: 7px;
+  }
+
+  .player-header-main {
+    gap: 5px;
+  }
+
+  .player-brand {
+    gap: 6px;
+  }
+
+  .player-brand h1 {
+    font-size: 18px;
+  }
+
+  .player-brand svg {
+    width: 20px;
+  }
+
+  .player-status {
+    font-size: 7px;
+  }
+
+  .music-player,
+  .playlist-panel {
+    padding: 11px;
+  }
+
+  .visualizer-area {
+    min-height: 175px;
+  }
+
+  .fullscreen-launch-row > span {
+    font-size: 9px;
+  }
+
+  .fullscreen-launch {
+    gap: 5px;
+    padding: 8px;
+    font-size: 10px;
+  }
+
+  .current-track h2 {
+    font-size: 14px;
+  }
+
+  .player-controls {
+    gap: 8px;
+  }
+
+  .playlist-header h2 {
+    font-size: 13px;
+  }
+
+  .playlist-header > div {
+    gap: 6px;
+  }
+
+  .playlist-header > span {
+    font-size: 10px;
+  }
+
+  .playlist-song {
+    gap: 5px;
+    padding: 9px 5px;
+  }
+
+  .song-select {
+    gap: 6px;
+  }
+
+  .song-select span {
+    font-size: 11px;
+  }
+}
+
+/* Evitar efectos hover problemáticos en dispositivos táctiles */
+
+@media (hover: none) {
+  .music-player:hover {
+    border-color: var(--color-border);
+    box-shadow:
+      0 15px 45px rgba(0, 0, 0, 0.25),
+      0 0 30px rgba(115, 68, 205, 0.06);
+  }
+
+  .add-music-button:hover {
+    transform: none;
+  }
+}

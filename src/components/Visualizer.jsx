@@ -1,6 +1,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import '../styles/visualizer.css';
+import { t } from './i18n/translations';
 
 const MODES = {
   classic: 'SPECTRUM',
@@ -21,70 +22,60 @@ const PRESET_COLORS = {
     high: '#995cff',
     accent: '#ed35d1'
   },
-
   Pop: {
     low: '#ff70c8',
     mid: '#ed35d1',
     high: '#ffc0ed',
     accent: '#ff4fa3'
   },
-
   Rock: {
     low: '#e63946',
     mid: '#ff623e',
     high: '#ffd166',
     accent: '#ff8a32'
   },
-
   Bass: {
     low: '#263bba',
     mid: '#6554ff',
     high: '#35b9f2',
     accent: '#995cff'
   },
-
   Electronic: {
     low: '#3155ff',
     mid: '#00e5ff',
     high: '#a855f7',
     accent: '#526bff'
   },
-
   Acoustic: {
     low: '#c87938',
     mid: '#e8b76a',
     high: '#8bc9a0',
     accent: '#f2d18b'
   },
-
   Jazz: {
     low: '#6535b8',
     mid: '#a45cff',
     high: '#ed35d1',
     accent: '#ff9acb'
   },
-
   Classical: {
     low: '#557acb',
     mid: '#b6d9f5',
     high: '#c6b5f5',
     accent: '#e6d6a5'
   },
-
   Vocal: {
     low: '#ff719e',
     mid: '#ff9bc8',
     high: '#ed35d1',
     accent: '#35e7f2'
   },
-
   Night: {
     low: '#18265e',
     mid: '#354b9c',
     high: '#7954c9',
     accent: '#a45cff'
   },
-
   Personalizado: {
     low: '#995cff',
     mid: '#35e7f2',
@@ -141,20 +132,40 @@ function Visualizer({
   preset = 'Normal',
   equalizerValues = [0, 0, 0, 0, 0],
   mode: controlledMode,
-  onModeChange
+  onModeChange,
+  language = 'es'
 }) {
   const canvasRef = useRef(null);
   const startTimeRef = useRef(null);
   const previousAnalyserRef = useRef(null);
   const equalizerValuesRef = useRef(equalizerValues);
 
-  // Se actualizan los valores sin reiniciar la animación del canvas.
   equalizerValuesRef.current = equalizerValues;
 
   const [internalMode, setInternalMode] = useState('classic');
 
   const mode = controlledMode ?? internalMode;
   const setMode = onModeChange ?? setInternalMode;
+
+  const tr = (key, spanish, english) => {
+    const translated = t(language, key);
+
+    if (!translated || translated === key) {
+      return language === 'en' ? english : spanish;
+    }
+
+    return translated;
+  };
+
+  const modeLabels = {
+    classic: tr('mode_classic', 'ESPECTRO', 'SPECTRUM'),
+    modern: tr('mode_modern', 'PULSO', 'PULSE'),
+    waveform: tr('mode_waveform', 'ONDA', 'WAVEFORM'),
+    mirror: tr('mode_mirror', 'ESPEJO NEÓN', 'NEON MIRROR'),
+    nebula: tr('mode_nebula', 'NEBULOSA', 'NEBULA'),
+    aurora: tr('mode_aurora', 'AURORA', 'AURORA'),
+    infinity: tr('mode_infinity', 'GEMAS DEL INFINITO', 'INFINITY STONES')
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -181,8 +192,6 @@ function Visualizer({
       ? new Uint8Array(analyser.fftSize)
       : new Uint8Array(1024);
 
-    // Memoria de suavizado exclusiva de Waveform.
-    // Evita que la línea cambie bruscamente entre fotogramas.
     const waveformSmoothData = new Float32Array(timeData.length).fill(128);
 
     const energy = {
@@ -252,35 +261,16 @@ function Visualizer({
       return count ? total / count / 255 : 0;
     };
 
-    // =========================================
-    // COLORES DINÁMICOS POR PRESET
-    // =========================================
-
     const getDynamicColors = (data, elapsed) => {
-      const low = getAverage(
-        data,
-        1,
-        Math.floor(data.length * 0.08)
-      );
-
-      const mid = getAverage(
-        data,
-        Math.floor(data.length * 0.08),
-        Math.floor(data.length * 0.35)
-      );
-
-      const high = getAverage(
-        data,
-        Math.floor(data.length * 0.35),
-        Math.floor(data.length * 0.85)
-      );
+      const low = getAverage(data, 1, Math.floor(data.length * 0.08));
+      const mid = getAverage(data, Math.floor(data.length * 0.08), Math.floor(data.length * 0.35));
+      const high = getAverage(data, Math.floor(data.length * 0.35), Math.floor(data.length * 0.85));
 
       energy.low += (low - energy.low) * 0.035;
       energy.mid += (mid - energy.mid) * 0.035;
       energy.high += (high - energy.high) * 0.035;
 
-      const palette =
-        PRESET_COLORS[preset] || PRESET_COLORS.Normal;
+      const palette = PRESET_COLORS[preset] || PRESET_COLORS.Normal;
 
       const cycle = (Math.sin(elapsed * 0.00013) + 1) / 2;
       const colorProgress = clamp((elapsed - 4000) / 8000);
@@ -290,31 +280,11 @@ function Visualizer({
       let highTarget;
       let accentTarget;
 
-      // NORMAL
       if (preset === 'Normal') {
-        lowTarget = mixColors(
-          '#6575ff',
-          '#35a9f2',
-          clamp(cycle * 0.35 + energy.low * 0.3, 0, 0.7)
-        );
-
-        midTarget = mixColors(
-          '#35e7f2',
-          '#6575ff',
-          clamp(cycle * 0.2 + energy.mid * 0.3, 0, 0.65)
-        );
-
-        highTarget = mixColors(
-          '#995cff',
-          '#ed35d1',
-          clamp(cycle * 0.35 + energy.high * 0.3, 0, 0.7)
-        );
-
-        accentTarget = mixColors(
-          '#ed35d1',
-          '#ff8acb',
-          clamp(cycle * 0.3 + energy.high * 0.2, 0, 0.7)
-        );
+        lowTarget = mixColors('#6575ff', '#35a9f2', clamp(cycle * 0.35 + energy.low * 0.3, 0, 0.7));
+        midTarget = mixColors('#35e7f2', '#6575ff', clamp(cycle * 0.2 + energy.mid * 0.3, 0, 0.65));
+        highTarget = mixColors('#995cff', '#ed35d1', clamp(cycle * 0.35 + energy.high * 0.3, 0, 0.7));
+        accentTarget = mixColors('#ed35d1', '#ff8acb', clamp(cycle * 0.3 + energy.high * 0.2, 0, 0.7));
 
         return {
           low: mixColors(BASE_CYAN, lowTarget, colorProgress),
@@ -324,31 +294,11 @@ function Visualizer({
         };
       }
 
-      // PERSONALIZADO
       if (preset === 'Personalizado') {
-        lowTarget = mixColors(
-          '#995cff',
-          '#35a9f2',
-          clamp(cycle * 0.4 + energy.low * 0.3, 0, 0.75)
-        );
-
-        midTarget = mixColors(
-          '#35e7f2',
-          '#6575ff',
-          clamp(cycle * 0.3 + energy.mid * 0.3, 0, 0.7)
-        );
-
-        highTarget = mixColors(
-          '#ed35d1',
-          '#ff8acb',
-          clamp(cycle * 0.35 + energy.high * 0.3, 0, 0.7)
-        );
-
-        accentTarget = mixColors(
-          '#ff8acb',
-          '#35a9f2',
-          clamp(cycle * 0.35 + energy.low * 0.2, 0, 0.7)
-        );
+        lowTarget = mixColors('#995cff', '#35a9f2', clamp(cycle * 0.4 + energy.low * 0.3, 0, 0.75));
+        midTarget = mixColors('#35e7f2', '#6575ff', clamp(cycle * 0.3 + energy.mid * 0.3, 0, 0.7));
+        highTarget = mixColors('#ed35d1', '#ff8acb', clamp(cycle * 0.35 + energy.high * 0.3, 0, 0.7));
+        accentTarget = mixColors('#ff8acb', '#35a9f2', clamp(cycle * 0.35 + energy.low * 0.2, 0, 0.7));
 
         return {
           low: mixColors(BASE_CYAN, lowTarget, colorProgress),
@@ -358,9 +308,6 @@ function Visualizer({
         };
       }
 
-      // PRESETS NUEVOS:
-      // Electronic, Acoustic, Jazz, Classical, Vocal y Night.
-      // Cada uno utiliza su propia paleta como punto de partida.
       const independentPresets = [
         'Electronic',
         'Acoustic',
@@ -370,36 +317,12 @@ function Visualizer({
         'Night'
       ];
 
-      const hasIndependentPalette =
-        independentPresets.includes(preset);
+      if (independentPresets.includes(preset)) {
+        lowTarget = mixColors(palette.low, palette.mid, clamp(cycle * 0.18 + energy.low * 0.42, 0, 0.58));
+        midTarget = mixColors(palette.mid, palette.high, clamp(cycle * 0.16 + energy.mid * 0.42, 0, 0.58));
+        highTarget = mixColors(palette.high, palette.accent, clamp(cycle * 0.22 + energy.high * 0.42, 0, 0.62));
+        accentTarget = mixColors(palette.accent, palette.low, clamp(cycle * 0.3 + energy.low * 0.22, 0, 0.58));
 
-      if (hasIndependentPalette) {
-        lowTarget = mixColors(
-          palette.low,
-          palette.mid,
-          clamp(cycle * 0.18 + energy.low * 0.42, 0, 0.58)
-        );
-
-        midTarget = mixColors(
-          palette.mid,
-          palette.high,
-          clamp(cycle * 0.16 + energy.mid * 0.42, 0, 0.58)
-        );
-
-        highTarget = mixColors(
-          palette.high,
-          palette.accent,
-          clamp(cycle * 0.22 + energy.high * 0.42, 0, 0.62)
-        );
-
-        accentTarget = mixColors(
-          palette.accent,
-          palette.low,
-          clamp(cycle * 0.3 + energy.low * 0.22, 0, 0.58)
-        );
-
-        // No se mezcla con BASE_CYAN.
-        // Cada preset conserva su identidad cromática.
         return {
           low: lowTarget,
           mid: midTarget,
@@ -408,31 +331,10 @@ function Visualizer({
         };
       }
 
-      // POP, ROCK Y BASS:
-      // Se conserva el comportamiento cromático anterior.
-      lowTarget = mixColors(
-        palette.low,
-        palette.accent,
-        clamp(cycle * 0.22 + energy.low * 0.38, 0, 0.65)
-      );
-
-      midTarget = mixColors(
-        palette.mid,
-        palette.high,
-        clamp(cycle * 0.2 + energy.mid * 0.4, 0, 0.65)
-      );
-
-      highTarget = mixColors(
-        palette.high,
-        palette.accent,
-        clamp(cycle * 0.25 + energy.high * 0.4, 0, 0.7)
-      );
-
-      accentTarget = mixColors(
-        palette.accent,
-        palette.low,
-        clamp(cycle * 0.4 + energy.low * 0.2, 0, 0.7)
-      );
+      lowTarget = mixColors(palette.low, palette.accent, clamp(cycle * 0.22 + energy.low * 0.38, 0, 0.65));
+      midTarget = mixColors(palette.mid, palette.high, clamp(cycle * 0.2 + energy.mid * 0.4, 0, 0.65));
+      highTarget = mixColors(palette.high, palette.accent, clamp(cycle * 0.25 + energy.high * 0.4, 0, 0.7));
+      accentTarget = mixColors(palette.accent, palette.low, clamp(cycle * 0.4 + energy.low * 0.2, 0, 0.7));
 
       return {
         low: mixColors(BASE_CYAN, lowTarget, colorProgress),
@@ -448,10 +350,7 @@ function Visualizer({
           ? 1000 / 30
           : 0;
 
-      if (
-        frameInterval &&
-        timestamp - lastFrameTime < frameInterval
-      ) {
+      if (frameInterval && timestamp - lastFrameTime < frameInterval) {
         animationId = requestAnimationFrame(draw);
         return;
       }
@@ -473,18 +372,11 @@ function Visualizer({
         return;
       }
 
-      const pixelRatio = Math.min(
-        window.devicePixelRatio || 1,
-        1.25
-      );
-
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.25);
       const canvasWidth = Math.round(width * pixelRatio);
       const canvasHeight = Math.round(height * pixelRatio);
 
-      if (
-        canvas.width !== canvasWidth ||
-        canvas.height !== canvasHeight
-      ) {
+      if (canvas.width !== canvasWidth || canvas.height !== canvasHeight) {
         canvas.width = canvasWidth;
         canvas.height = canvasHeight;
       }
@@ -506,51 +398,21 @@ function Visualizer({
         case 'classic':
           drawClassic(ctx, width, height, frequencyData, colors);
           break;
-
         case 'modern':
           drawModern(ctx, width, height, frequencyData, colors);
           break;
-
         case 'waveform':
-          drawWaveform(
-            ctx,
-            width,
-            height,
-            timeData,
-            colors,
-            waveformSmoothData
-          );
+          drawWaveform(ctx, width, height, timeData, colors, waveformSmoothData);
           break;
-
         case 'mirror':
           drawMirror(ctx, width, height, frequencyData, colors);
           break;
-
         case 'nebula':
-          drawNebula(
-            ctx,
-            width,
-            height,
-            frequencyData,
-            colors,
-            energy,
-            particles,
-            elapsed
-          );
+          drawNebula(ctx, width, height, frequencyData, colors, energy, particles, elapsed);
           break;
-
         case 'aurora':
-          drawAurora(
-            ctx,
-            width,
-            height,
-            colors,
-            energy,
-            elapsed,
-            auroraStrands
-          );
+          drawAurora(ctx, width, height, colors, energy, elapsed, auroraStrands);
           break;
-
         case 'infinity':
           drawInfinityStones(
             ctx,
@@ -564,7 +426,6 @@ function Visualizer({
             equalizerValuesRef.current
           );
           break;
-
         default:
           break;
       }
@@ -581,57 +442,36 @@ function Visualizer({
     <div className="visualizer-stage">
       <div className="visualizer-toolbar">
         <span className="visualizer-label">
-          ECHOPULSE VISUALIZER
+          {tr('visualizerTitle', 'ECHOPULSE VISUALIZADOR', 'ECHOPULSE VISUALIZER')}
         </span>
 
         <div className="visualizer-modes">
-          <button
-            className={mode === 'classic' ? 'selected' : ''}
-            onClick={() => setMode('classic')}
-          >
-            Spectrum
+          <button className={mode === 'classic' ? 'selected' : ''} onClick={() => setMode('classic')}>
+            {tr('spectrum', 'Espectro', 'Spectrum')}
           </button>
 
-          <button
-            className={mode === 'modern' ? 'selected' : ''}
-            onClick={() => setMode('modern')}
-          >
-            Pulse
+          <button className={mode === 'modern' ? 'selected' : ''} onClick={() => setMode('modern')}>
+            {tr('pulse', 'Pulso', 'Pulse')}
           </button>
 
-          <button
-            className={mode === 'waveform' ? 'selected' : ''}
-            onClick={() => setMode('waveform')}
-          >
-            Waveform
+          <button className={mode === 'waveform' ? 'selected' : ''} onClick={() => setMode('waveform')}>
+            {tr('waveform', 'Forma de onda', 'Waveform')}
           </button>
 
-          <button
-            className={mode === 'mirror' ? 'selected' : ''}
-            onClick={() => setMode('mirror')}
-          >
-            Neon Mirror
+          <button className={mode === 'mirror' ? 'selected' : ''} onClick={() => setMode('mirror')}>
+            {tr('neonMirror', 'Espejo neón', 'Neon Mirror')}
           </button>
 
-          <button
-            className={mode === 'nebula' ? 'selected' : ''}
-            onClick={() => setMode('nebula')}
-          >
-            Nebula
+          <button className={mode === 'nebula' ? 'selected' : ''} onClick={() => setMode('nebula')}>
+            {tr('nebula', 'Nebulosa', 'Nebula')}
           </button>
 
-          <button
-            className={mode === 'aurora' ? 'selected' : ''}
-            onClick={() => setMode('aurora')}
-          >
-            Aurora
+          <button className={mode === 'aurora' ? 'selected' : ''} onClick={() => setMode('aurora')}>
+            {tr('aurora', 'Aurora', 'Aurora')}
           </button>
 
-          <button
-            className={mode === 'infinity' ? 'selected' : ''}
-            onClick={() => setMode('infinity')}
-          >
-            Infinity Stones
+          <button className={mode === 'infinity' ? 'selected' : ''} onClick={() => setMode('infinity')}>
+            {tr('infinityStones', 'Gemas del infinito', 'Infinity Stones')}
           </button>
         </div>
       </div>
@@ -640,10 +480,12 @@ function Visualizer({
 
       <div className="visualizer-footer">
         <span>
-          {analyser ? 'AUDIO ANALYZER ACTIVE' : 'WAITING FOR AUDIO'}
+          {analyser
+            ? tr('audioAnalyzerActive', 'ANALIZADOR DE AUDIO ACTIVO', 'AUDIO ANALYZER ACTIVE')
+            : tr('waitingForAudio', 'ESPERANDO AUDIO', 'WAITING FOR AUDIO')}
         </span>
 
-        <span>{MODES[mode]}</span>
+        <span>{modeLabels[mode] || MODES[mode]}</span>
       </div>
     </div>
   );
@@ -655,7 +497,6 @@ function drawClassic(ctx, width, height, data, colors) {
   const gap = 3;
 
   const gradient = ctx.createLinearGradient(0, height, 0, 0);
-
   gradient.addColorStop(0, colors.low);
   gradient.addColorStop(0.5, colors.mid);
   gradient.addColorStop(1, colors.high);
@@ -669,12 +510,7 @@ function drawClassic(ctx, width, height, data, colors) {
     const y = height - barHeight - 25;
 
     ctx.fillStyle = gradient;
-    ctx.fillRect(
-      x + gap / 2,
-      y,
-      Math.max(1, barWidth - gap),
-      barHeight
-    );
+    ctx.fillRect(x + gap / 2, y, Math.max(1, barWidth - gap), barHeight);
 
     ctx.globalAlpha = 0.12;
     ctx.fillRect(
@@ -683,7 +519,6 @@ function drawClassic(ctx, width, height, data, colors) {
       Math.max(1, barWidth - gap),
       Math.min(barHeight * 0.35, 35)
     );
-
     ctx.globalAlpha = 1;
   }
 }
@@ -691,12 +526,10 @@ function drawClassic(ctx, width, height, data, colors) {
 function drawModern(ctx, width, height, data, colors) {
   const centerX = width / 2;
   const centerY = height / 2;
-
   const radius = Math.min(width, height) * 0.20;
   const bars = 100;
 
   const gradient = ctx.createLinearGradient(0, 0, width, height);
-
   gradient.addColorStop(0, colors.low);
   gradient.addColorStop(0.5, colors.mid);
   gradient.addColorStop(1, colors.magenta);
@@ -706,12 +539,10 @@ function drawModern(ctx, width, height, data, colors) {
 
   ctx.beginPath();
   ctx.arc(0, 0, radius, 0, Math.PI * 2);
-
   ctx.strokeStyle = colors.mid;
   ctx.globalAlpha = 0.35;
   ctx.lineWidth = 2;
   ctx.stroke();
-
   ctx.globalAlpha = 1;
 
   for (let i = 0; i < bars; i++) {
@@ -737,36 +568,21 @@ function drawModern(ctx, width, height, data, colors) {
 
   ctx.shadowBlur = 0;
 
-  const centerGradient = ctx.createRadialGradient(
-    0, 0, 2,
-    0, 0, radius * 0.85
-  );
-
+  const centerGradient = ctx.createRadialGradient(0, 0, 2, 0, 0, radius * 0.85);
   centerGradient.addColorStop(0, colors.mid);
   centerGradient.addColorStop(1, 'rgba(0,0,0,0)');
 
   ctx.beginPath();
   ctx.arc(0, 0, radius * 0.85, 0, Math.PI * 2);
-
   ctx.globalAlpha = 0.22;
   ctx.fillStyle = centerGradient;
   ctx.fill();
-
   ctx.globalAlpha = 1;
   ctx.restore();
 }
 
-// WAVEFORM: versión más suave y menos intensa.
-function drawWaveform(
-  ctx,
-  width,
-  height,
-  data,
-  colors,
-  smoothData
-) {
+function drawWaveform(ctx, width, height, data, colors, smoothData) {
   const centerY = height / 2;
-
   const gradient = ctx.createLinearGradient(0, 0, width, 0);
 
   gradient.addColorStop(0, colors.low);
@@ -774,13 +590,11 @@ function drawWaveform(
   gradient.addColorStop(1, colors.magenta);
 
   const points = [];
-
   const amplitudeScale = height * 0.25;
   const smoothing = 0.18;
 
   for (let i = 0; i < data.length; i++) {
     const target = data[i];
-
     smoothData[i] += (target - smoothData[i]) * smoothing;
 
     const x = (i / (data.length - 1)) * width;
@@ -793,7 +607,6 @@ function drawWaveform(
   }
 
   ctx.save();
-
   ctx.beginPath();
   ctx.moveTo(points[0].x, points[0].y);
 
@@ -804,53 +617,33 @@ function drawWaveform(
     const middleX = (current.x + next.x) / 2;
     const middleY = (current.y + next.y) / 2;
 
-    ctx.quadraticCurveTo(
-      current.x,
-      current.y,
-      middleX,
-      middleY
-    );
+    ctx.quadraticCurveTo(current.x, current.y, middleX, middleY);
   }
 
   const last = points[points.length - 1];
-
   ctx.lineTo(last.x, last.y);
 
   ctx.strokeStyle = gradient;
   ctx.lineWidth = 2.2;
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
-
   ctx.shadowBlur = 9;
   ctx.shadowColor = colors.mid;
-
   ctx.stroke();
-
   ctx.shadowBlur = 0;
 
   ctx.beginPath();
   ctx.moveTo(0, centerY);
   ctx.lineTo(width, centerY);
-
   ctx.strokeStyle = colors.low;
   ctx.globalAlpha = 0.12;
   ctx.lineWidth = 1;
-
   ctx.stroke();
 
   ctx.restore();
 }
 
-function drawNebula(
-  ctx,
-  width,
-  height,
-  data,
-  colors,
-  energy,
-  particles,
-  elapsed
-) {
+function drawNebula(ctx, width, height, data, colors, energy, particles, elapsed) {
   const centerX = width / 2;
   const centerY = height / 2;
   const time = elapsed * 0.001;
@@ -870,16 +663,10 @@ function drawNebula(
     const direction = side === 0 ? 1 : -1;
 
     particles.forEach((particle, index) => {
-      const frequencyIndex = Math.floor(
-        (index / particles.length) * data.length * 0.55
-      );
-
+      const frequencyIndex = Math.floor((index / particles.length) * data.length * 0.55);
       const audioValue = data[frequencyIndex] / 255;
 
-      const phase =
-        time * particle.speed +
-        particle.phase +
-        side * 1.35;
+      const phase = time * particle.speed + particle.phase + side * 1.35;
 
       const flowX =
         Math.sin(phase * 0.7 + particle.y * 3) * 0.045 +
@@ -891,20 +678,12 @@ function drawNebula(
 
       const mirroredX = particle.x * direction;
 
-      const x = centerX +
-        (mirroredX + flowX * direction) * spreadX;
+      const x = centerX + (mirroredX + flowX * direction) * spreadX;
+      const y = centerY + (particle.y + flowY + side * 0.025) * spreadY;
 
-      const y = centerY +
-        (particle.y + flowY + side * 0.025) * spreadY;
+      const pulse = 0.8 + Math.sin(time * 1.2 + particle.phase + side) * 0.18;
 
-      const pulse =
-        0.8 +
-        Math.sin(time * 1.2 + particle.phase + side) * 0.18;
-
-      const size = particle.size *
-        pulse *
-        (0.85 + audioValue * 0.8) *
-        particle.depth;
+      const size = particle.size * pulse * (0.85 + audioValue * 0.8) * particle.depth;
 
       const groupIndex =
         particle.color < 0.34 ? 0 :
@@ -932,50 +711,27 @@ function drawNebula(
   ctx.fillStyle = '#ffffff';
   ctx.globalAlpha = 0.25 + energy.high * 0.12;
   ctx.fill(highlights);
-
   ctx.restore();
 }
 
-function drawAurora(
-  ctx,
-  width,
-  height,
-  colors,
-  energy,
-  elapsed,
-  strands
-) {
+function drawAurora(ctx, width, height, colors, energy, elapsed, strands) {
   const time = elapsed * 0.00035;
-
-  const palette = [
-    colors.low,
-    colors.mid,
-    colors.high,
-    colors.magenta
-  ];
+  const palette = [colors.low, colors.mid, colors.high, colors.magenta];
 
   ctx.save();
   ctx.globalCompositeOperation = 'screen';
 
   const ambient = ctx.createLinearGradient(0, 0, width, height);
-
   ambient.addColorStop(0, 'rgba(0,0,0,0)');
-  ambient.addColorStop(
-    0.5,
-    `rgba(70,100,190,${0.035 + energy.mid * 0.025})`
-  );
+  ambient.addColorStop(0.5, `rgba(70,100,190,${0.035 + energy.mid * 0.025})`);
   ambient.addColorStop(1, 'rgba(0,0,0,0)');
 
   ctx.fillStyle = ambient;
   ctx.fillRect(0, 0, width, height);
 
-  strands.forEach((strand) => {
-    const color = palette[
-      Math.floor(strand.color * palette.length)
-    ];
-
+  strands.forEach(strand => {
+    const color = palette[Math.floor(strand.color * palette.length)];
     const rgb = getRGB(color);
-
     const phase = time * strand.speed + strand.phase;
 
     const top = height * strand.top;
@@ -998,15 +754,10 @@ function drawAurora(
         Math.sin(phase + progress * 3.2) * strand.sway * 0.42 +
         Math.sin(phase * 0.7 + progress * 6) * strand.sway * 0.22;
 
-      const audioFold =
-        Math.sin(progress * Math.PI) * energy.mid * 18;
-
+      const audioFold = Math.sin(progress * Math.PI) * energy.mid * 18;
       const x = centerX + flowing + audioFold;
 
-      const taper = Math.pow(
-        Math.sin(progress * Math.PI),
-        0.65
-      );
+      const taper = Math.pow(Math.sin(progress * Math.PI), 0.65);
 
       const widthVariation =
         strand.width *
@@ -1044,25 +795,16 @@ function drawAurora(
       const middleX = (previous.left + current.left) / 2;
       const middleY = (previous.y + current.y) / 2;
 
-      ctx.quadraticCurveTo(
-        previous.left,
-        previous.y,
-        middleX,
-        middleY
-      );
+      ctx.quadraticCurveTo(previous.left, previous.y, middleX, middleY);
     }
 
-    ctx.lineTo(
-      points[points.length - 1].right,
-      points[points.length - 1].y
-    );
+    ctx.lineTo(points[points.length - 1].right, points[points.length - 1].y);
 
     for (let i = points.length - 1; i >= 0; i--) {
       ctx.lineTo(points[i].right, points[i].y);
     }
 
     ctx.closePath();
-
     ctx.fillStyle = gradient;
     ctx.globalAlpha = 0.95 + energy.mid * 0.05;
     ctx.fill();
@@ -1075,10 +817,7 @@ function drawAurora(
     );
 
     coreGradient.addColorStop(0, 'rgba(255,255,255,0)');
-    coreGradient.addColorStop(
-      0.5,
-      `rgba(${rgb[0]},${rgb[1]},${rgb[2]},0.22)`
-    );
+    coreGradient.addColorStop(0.5, `rgba(${rgb[0]},${rgb[1]},${rgb[2]},0.22)`);
     coreGradient.addColorStop(1, 'rgba(255,255,255,0)');
 
     ctx.fillStyle = coreGradient;
@@ -1110,7 +849,6 @@ function drawInfinityStones(
 
   const stoneHeight = stoneWidth * 1.38;
   const gap = stoneWidth * 0.48;
-
   const totalWidth = stoneWidth * 6 + gap * 5;
   const startX = (width - totalWidth) / 2 + stoneWidth / 2;
   const centerY = height / 2;
@@ -1124,7 +862,6 @@ function drawInfinityStones(
     [0.66, 0.85]
   ];
 
-  // Relación entre las seis gemas y las cinco bandas del ecualizador.
   const eq = equalizerValues || [0, 0, 0, 0, 0];
 
   const eqInfluence = [
@@ -1156,40 +893,28 @@ function drawInfinityStones(
 
   INFINITY_COLORS.forEach((color, index) => {
     const x = startX + index * (stoneWidth + gap);
-
     const range = bandRanges[index];
 
     const start = Math.floor(data.length * range[0]);
-    const end = Math.max(
-      start + 1,
-      Math.floor(data.length * range[1])
-    );
+    const end = Math.max(start + 1, Math.floor(data.length * range[1]));
 
     const audio = getAverage(data, start, end);
-
     const eqGain = eqInfluence[index];
 
     const adjustedAudio = clamp(
-      audio * (1 + eqGain * 0.025) +
-      eqGain * 0.012
+      audio * (1 + eqGain * 0.025) + eqGain * 0.012
     );
 
-    stoneEnergy[index] +=
-      (adjustedAudio - stoneEnergy[index]) * 0.12;
+    stoneEnergy[index] += (adjustedAudio - stoneEnergy[index]) * 0.12;
 
     const sound = stoneEnergy[index];
-
-    const breathing =
-      Math.sin(time * 1.15 + index * 0.8) * 0.045;
-
+    const breathing = Math.sin(time * 1.15 + index * 0.8) * 0.045;
     const pulse = 1 + breathing + sound * 0.18;
 
     const currentWidth = stoneWidth * pulse;
     const currentHeight = stoneHeight * pulse;
-
     const glow = 0.75 + sound * 0.65;
     const rgb = getRGB(color);
-
     const auraRadius = currentWidth * (1.5 + sound * 0.45);
 
     const aura = ctx.createRadialGradient(
@@ -1201,93 +926,42 @@ function drawInfinityStones(
       auraRadius
     );
 
-    aura.addColorStop(
-      0,
-      `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${0.28 * glow})`
-    );
-
-    aura.addColorStop(
-      0.45,
-      `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${0.13 * glow})`
-    );
-
+    aura.addColorStop(0, `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${0.28 * glow})`);
+    aura.addColorStop(0.45, `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${0.13 * glow})`);
     aura.addColorStop(1, 'rgba(0,0,0,0)');
 
     ctx.fillStyle = aura;
     ctx.beginPath();
-
-    ctx.ellipse(
-      x,
-      centerY,
-      auraRadius,
-      auraRadius * 1.2,
-      0,
-      0,
-      Math.PI * 2
-    );
-
+    ctx.ellipse(x, centerY, auraRadius, auraRadius * 1.2, 0, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.save();
-
     ctx.translate(x, centerY);
     ctx.scale(currentWidth / 2, currentHeight / 2);
 
-    const coreGradient = ctx.createRadialGradient(
-      -0.18,
-      -0.24,
-      0.04,
-      0,
-      0,
-      1
-    );
+    const coreGradient = ctx.createRadialGradient(-0.18, -0.24, 0.04, 0, 0, 1);
 
-    coreGradient.addColorStop(
-      0,
-      `rgba(255,255,255,${0.95 + sound * 0.05})`
-    );
-
-    coreGradient.addColorStop(
-      0.16,
-      `rgba(${rgb[0]},${rgb[1]},${rgb[2]},0.98)`
-    );
-
-    coreGradient.addColorStop(
-      0.52,
-      `rgba(${rgb[0]},${rgb[1]},${rgb[2]},0.78)`
-    );
-
-    coreGradient.addColorStop(
-      0.82,
-      `rgba(${rgb[0]},${rgb[1]},${rgb[2]},0.38)`
-    );
-
-    coreGradient.addColorStop(
-      1,
-      `rgba(${rgb[0]},${rgb[1]},${rgb[2]},0.04)`
-    );
+    coreGradient.addColorStop(0, `rgba(255,255,255,${0.95 + sound * 0.05})`);
+    coreGradient.addColorStop(0.16, `rgba(${rgb[0]},${rgb[1]},${rgb[2]},0.98)`);
+    coreGradient.addColorStop(0.52, `rgba(${rgb[0]},${rgb[1]},${rgb[2]},0.78)`);
+    coreGradient.addColorStop(0.82, `rgba(${rgb[0]},${rgb[1]},${rgb[2]},0.38)`);
+    coreGradient.addColorStop(1, `rgba(${rgb[0]},${rgb[1]},${rgb[2]},0.04)`);
 
     ctx.beginPath();
     ctx.ellipse(0, 0, 0.88, 0.92, 0, 0, Math.PI * 2);
-
     ctx.fillStyle = coreGradient;
     ctx.shadowBlur = 28 + sound * 30;
     ctx.shadowColor = color;
     ctx.fill();
-
     ctx.shadowBlur = 0;
 
     ctx.save();
-
     ctx.beginPath();
     ctx.ellipse(0, 0, 0.87, 0.91, 0, 0, Math.PI * 2);
     ctx.clip();
 
     for (let wave = 0; wave < 3; wave++) {
-      const phase =
-        time * (0.75 + wave * 0.2) +
-        index * 0.8 +
-        wave * 2.1;
+      const phase = time * (0.75 + wave * 0.2) + index * 0.8 + wave * 2.1;
 
       ctx.beginPath();
 
@@ -1300,11 +974,8 @@ function drawInfinityStones(
           Math.cos(px * 6.2 - phase * 0.7) * 0.07 +
           (wave - 1) * 0.19;
 
-        if (point === 0) {
-          ctx.moveTo(px, py);
-        } else {
-          ctx.lineTo(px, py);
-        }
+        if (point === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
       }
 
       ctx.strokeStyle = wave === 1
@@ -1316,26 +987,20 @@ function drawInfinityStones(
     }
 
     for (let swirl = 0; swirl < 2; swirl++) {
-      const rotation =
-        time * (swirl === 0 ? 0.55 : -0.42) +
-        index * 0.65;
+      const rotation = time * (swirl === 0 ? 0.55 : -0.42) + index * 0.65;
 
       ctx.beginPath();
 
       for (let point = 0; point <= 36; point++) {
         const progress = point / 36;
         const angle = progress * Math.PI * 2 + rotation;
-
         const radius = 0.12 + progress * 0.62;
 
         const px = Math.cos(angle) * radius * 0.75;
         const py = Math.sin(angle) * radius * 0.82;
 
-        if (point === 0) {
-          ctx.moveTo(px, py);
-        } else {
-          ctx.lineTo(px, py);
-        }
+        if (point === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
       }
 
       ctx.strokeStyle = `rgba(255,255,255,${0.14 + sound * 0.13})`;
@@ -1347,7 +1012,6 @@ function drawInfinityStones(
     ctx.restore();
 
     ctx.save();
-
     ctx.beginPath();
     ctx.ellipse(
       x,
@@ -1365,10 +1029,9 @@ function drawInfinityStones(
     ctx.shadowBlur = 14 + sound * 12;
     ctx.shadowColor = color;
     ctx.stroke();
-
     ctx.restore();
 
-    particles[index].forEach((particle) => {
+    particles[index].forEach(particle => {
       const angle = particle.angle + time * particle.speed;
 
       const distance =
@@ -1376,25 +1039,12 @@ function drawInfinityStones(
         Math.sin(time * 1.3 + particle.phase) * 0.08 +
         sound * 0.16;
 
-      const particleX =
-        x + Math.cos(angle) * currentWidth * distance * 0.65;
-
-      const particleY =
-        centerY +
-        Math.sin(angle) * currentHeight * distance * 0.65;
-
-      const particleSize =
-        particle.size * (0.8 + sound * 0.8);
+      const particleX = x + Math.cos(angle) * currentWidth * distance * 0.65;
+      const particleY = centerY + Math.sin(angle) * currentHeight * distance * 0.65;
+      const particleSize = particle.size * (0.8 + sound * 0.8);
 
       ctx.beginPath();
-      ctx.arc(
-        particleX,
-        particleY,
-        particleSize,
-        0,
-        Math.PI * 2
-      );
-
+      ctx.arc(particleX, particleY, particleSize, 0, Math.PI * 2);
       ctx.fillStyle = '#ffffff';
       ctx.globalAlpha = particle.opacity * (0.65 + sound * 0.5);
       ctx.fill();
@@ -1426,7 +1076,6 @@ function drawMirror(ctx, width, height, data, colors) {
   const bars = 72;
   const barWidth = width / bars;
   const gap = 3;
-
   const centerY = height / 2;
   const maxHeight = height * 0.38;
 
@@ -1458,23 +1107,19 @@ function drawMirror(ctx, width, height, data, colors) {
     const actualWidth = Math.max(1, barWidth - gap);
 
     ctx.fillStyle = gradient;
-
     ctx.fillRect(x, centerY - barHeight, actualWidth, barHeight);
     ctx.fillRect(x, centerY, actualWidth, barHeight);
 
     if (value > 0.55) {
       ctx.fillStyle = neon.magenta;
       ctx.globalAlpha = 0.3;
-
       ctx.fillRect(x, centerY - barHeight, actualWidth, 2);
       ctx.fillRect(x, centerY + barHeight - 2, actualWidth, 2);
-
       ctx.globalAlpha = 1;
     }
   }
 
   ctx.save();
-
   ctx.beginPath();
   ctx.moveTo(0, centerY);
   ctx.lineTo(width, centerY);

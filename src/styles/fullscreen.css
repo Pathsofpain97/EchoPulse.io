@@ -1219,3 +1219,655 @@
     transition: none;
   }
 }
+
+
+/* =========================================
+   ECHOPULSE - RESPONSIVE FULLSCREEN
+   MOBILE PORTRAIT AND LANDSCAPE
+========================================= */
+
+/* Altura real disponible y límites de contenido */
+
+.player-layout:fullscreen {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.player-layout:fullscreen .fullscreen-experience {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* =========================================
+   TABLETS Y MÓVILES
+========================================= */
+
+@media (max-width: 700px) {
+  .fullscreen-experience {
+    padding:
+      max(10px, env(safe-area-inset-top))
+      max(10px, env(safe-area-inset-right))
+      max(10px, env(safe-area-inset-bottom))
+      max(10px, env(safe-area-inset-left));
+
+    height: 100%;
+    height: 100dvh;
+  }
+
+  .fullscreen-topbar {
+    top: max(10px, env(safe-area-inset-top));
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    min-height: 36px;
+  }
+
+  .fullscreen-brand {
+    gap: 6px;
+    font-size: 14px;
+  }
+
+  .fullscreen-brand svg {
+    width: 19px;
+  }
+
+  .fullscreen-topbar-actions {
+    gap: 5px;
+  }
+
+  .fullscreen-topbar-actions .language-selector {
+    padding: 3px;
+  }
+
+  .fullscreen-topbar-actions .language-selector button {
+    min-width: 27px;
+    height: 25px;
+    padding: 0 5px;
+    font-size: 9px;
+  }
+
+  .fullscreen-library-toggle {
+    min-height: 34px;
+    padding: 0 8px;
+    gap: 5px;
+  }
+
+  .fullscreen-exit {
+    width: 34px;
+    height: 34px;
+  }
+
+  /* Zona central: visualizador arriba y canción debajo */
+
+  .fullscreen-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+
+    gap: 7px;
+
+    padding: 52px 0 0;
+    overflow: hidden;
+  }
+
+  .fullscreen-experience.controls-visible .fullscreen-main {
+    /*
+      Ya no reservamos 42vh.
+      Los controles flotantes no deben quitarle
+      artificialmente espacio al visualizador.
+    */
+    padding-bottom: 0;
+  }
+
+  .fullscreen-visualizer {
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .fullscreen-visualizer .visualizer-stage {
+    min-height: 0;
+    height: 100%;
+  }
+
+  .fullscreen-visualizer .visualizer-toolbar {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 7px;
+
+    max-height: 95px;
+    padding: 4px 0 7px;
+  }
+
+  .fullscreen-visualizer .visualizer-toolbar > span {
+    width: 100%;
+    text-align: center;
+    font-size: 9px;
+  }
+
+  .fullscreen-visualizer .visualizer-modes {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .fullscreen-visualizer .visualizer-modes button {
+    padding: 6px 8px;
+    font-size: 9px;
+  }
+
+  .fullscreen-visualizer .visualizer-footer {
+    padding-top: 5px;
+  }
+
+  /* Canción actual */
+
+  .fullscreen-now-playing {
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+
+    align-items: center;
+    column-gap: 10px;
+
+    min-width: 0;
+    padding: 8px 0;
+
+    border-left: none;
+    border-top: 1px solid rgba(126, 117, 255, 0.22);
+  }
+
+  .fullscreen-eyebrow {
+    grid-column: 1 / -1;
+    margin-bottom: 5px;
+    font-size: 8px;
+  }
+
+  .fullscreen-track-icon {
+    grid-column: 1;
+    grid-row: 2 / 4;
+
+    width: 38px;
+    height: 38px;
+
+    margin: 0;
+    border-radius: 10px;
+  }
+
+  .fullscreen-track-icon svg {
+    width: 19px;
+  }
+
+  .fullscreen-now-playing h2 {
+    grid-column: 2;
+    grid-row: 2;
+
+    min-width: 0;
+    font-size: 13px;
+  }
+
+  .fullscreen-now-playing p {
+    grid-column: 2;
+    grid-row: 3;
+
+    margin: 2px 0 0;
+    font-size: 9px;
+  }
+
+  .fullscreen-track-status {
+    display: none;
+  }
+
+  /* Controles flotantes */
+
+  .fullscreen-controls {
+    position: absolute;
+
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    bottom: max(10px, env(safe-area-inset-bottom));
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+
+    gap: 8px;
+
+    max-height: min(40vh, 300px);
+    max-height: min(40dvh, 300px);
+
+    padding: 9px;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    border-radius: 12px;
+  }
+
+  .fullscreen-playback {
+    gap: 6px;
+  }
+
+  .fullscreen-progress {
+    grid-template-columns: 32px minmax(0, 1fr) 32px;
+    gap: 6px;
+    font-size: 9px;
+  }
+
+  .fullscreen-buttons {
+    gap: 7px;
+  }
+
+  .fullscreen-buttons button {
+    width: 34px;
+    height: 34px;
+  }
+
+  .fullscreen-buttons .fullscreen-play-button {
+    width: 42px;
+    height: 42px;
+  }
+
+  .fullscreen-volume {
+    width: min(90px, 22vw);
+    margin-left: 3px;
+  }
+
+  /* Ecualizador compacto */
+
+  .fullscreen-equalizer {
+    max-height: 125px;
+    overflow-y: auto;
+  }
+
+  .fullscreen-equalizer .equalizer-panel {
+    padding: 7px;
+  }
+
+  .fullscreen-equalizer .equalizer-header {
+    margin-bottom: 5px;
+  }
+
+  .fullscreen-equalizer .equalizer-presets {
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+
+  .fullscreen-equalizer .equalizer-presets button {
+    padding: 4px 6px;
+    font-size: 9px;
+  }
+
+  .fullscreen-equalizer .equalizer-band-info p {
+    display: none;
+  }
+
+  /* Biblioteca */
+
+  .fullscreen-library-panel {
+    position: absolute;
+
+    top: max(55px, calc(env(safe-area-inset-top) + 45px));
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    bottom: max(10px, env(safe-area-inset-bottom));
+
+    width: auto;
+    max-width: none;
+
+    padding: 13px;
+
+    overflow: hidden;
+  }
+
+  .fullscreen-library-header {
+    margin-bottom: 10px;
+  }
+
+  .fullscreen-library-header h2 {
+    font-size: 16px;
+  }
+
+  .fullscreen-library-list {
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .fullscreen-hint {
+    top: 53px;
+    font-size: 9px;
+  }
+}
+
+/* =========================================
+   MÓVILES MUY PEQUEÑOS
+========================================= */
+
+@media (max-width: 400px) {
+  .fullscreen-experience {
+    padding:
+      max(8px, env(safe-area-inset-top))
+      max(8px, env(safe-area-inset-right))
+      max(8px, env(safe-area-inset-bottom))
+      max(8px, env(safe-area-inset-left));
+  }
+
+  .fullscreen-topbar {
+    left: max(8px, env(safe-area-inset-left));
+    right: max(8px, env(safe-area-inset-right));
+  }
+
+  .fullscreen-brand {
+    font-size: 12px;
+  }
+
+  .fullscreen-library-toggle span:not(.fullscreen-library-count) {
+    display: none;
+  }
+
+  .fullscreen-library-toggle {
+    width: 34px;
+    padding: 0;
+  }
+
+  .fullscreen-main {
+    padding-top: 47px;
+    gap: 5px;
+  }
+
+  .fullscreen-visualizer .visualizer-toolbar {
+    gap: 4px;
+    max-height: 85px;
+  }
+
+  .fullscreen-visualizer .visualizer-modes {
+    gap: 4px;
+  }
+
+  .fullscreen-visualizer .visualizer-modes button {
+    padding: 5px 6px;
+    font-size: 8px;
+  }
+
+  .fullscreen-now-playing {
+    padding: 6px 0;
+  }
+
+  .fullscreen-controls {
+    left: 8px;
+    right: 8px;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    gap: 6px;
+    padding: 7px;
+    max-height: min(42dvh, 280px);
+  }
+
+  .fullscreen-volume {
+    width: 62px;
+  }
+
+  .fullscreen-equalizer {
+    max-height: 105px;
+  }
+
+  .fullscreen-equalizer .equalizer-presets button {
+    padding: 3px 4px;
+    font-size: 8px;
+  }
+
+  .fullscreen-library-panel {
+    left: 8px;
+    right: 8px;
+    padding: 10px;
+  }
+}
+
+/* =========================================
+   MÓVILES EN HORIZONTAL
+========================================= */
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .fullscreen-experience {
+    padding:
+      max(7px, env(safe-area-inset-top))
+      max(10px, env(safe-area-inset-right))
+      max(7px, env(safe-area-inset-bottom))
+      max(10px, env(safe-area-inset-left));
+  }
+
+  .fullscreen-topbar {
+    top: 7px;
+    left: 10px;
+    right: 10px;
+    min-height: 30px;
+  }
+
+  .fullscreen-brand {
+    font-size: 12px;
+  }
+
+  .fullscreen-exit {
+    width: 30px;
+    height: 30px;
+  }
+
+  .fullscreen-library-toggle {
+    min-height: 30px;
+  }
+
+  .fullscreen-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(120px, 170px);
+    grid-template-rows: minmax(0, 1fr);
+
+    gap: 12px;
+
+    padding: 38px 0 0;
+  }
+
+  .fullscreen-experience.controls-visible .fullscreen-main {
+    padding-bottom: 0;
+  }
+
+  .fullscreen-visualizer {
+    min-height: 0;
+  }
+
+  .fullscreen-visualizer .visualizer-toolbar {
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 6px;
+    max-height: 55px;
+    padding: 2px 0 5px;
+  }
+
+  .fullscreen-visualizer .visualizer-toolbar > span {
+    display: none;
+  }
+
+  .fullscreen-visualizer .visualizer-modes {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .fullscreen-visualizer .visualizer-modes button {
+    padding: 4px 6px;
+    font-size: 8px;
+  }
+
+  .fullscreen-now-playing {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+
+    padding: 8px 0 8px 10px;
+
+    border-top: none;
+    border-left: 1px solid rgba(126, 117, 255, 0.22);
+  }
+
+  .fullscreen-eyebrow {
+    font-size: 7px;
+  }
+
+  .fullscreen-track-icon {
+    width: 36px;
+    height: 36px;
+    margin: 8px 0;
+  }
+
+  .fullscreen-track-icon svg {
+    width: 18px;
+  }
+
+  .fullscreen-now-playing h2 {
+    font-size: 12px;
+  }
+
+  .fullscreen-now-playing p {
+    font-size: 9px;
+    margin: 4px 0;
+  }
+
+  .fullscreen-controls {
+    left: 10px;
+    right: 10px;
+    bottom: max(7px, env(safe-area-inset-bottom));
+
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: 10px;
+
+    max-height: 37dvh;
+    padding: 7px 10px;
+
+    overflow-y: auto;
+  }
+
+  .fullscreen-playback {
+    gap: 5px;
+  }
+
+  .fullscreen-buttons {
+    gap: 5px;
+  }
+
+  .fullscreen-buttons button {
+    width: 30px;
+    height: 30px;
+  }
+
+  .fullscreen-buttons .fullscreen-play-button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .fullscreen-volume {
+    width: 65px;
+  }
+
+  .fullscreen-equalizer {
+    max-height: 110px;
+  }
+
+  .fullscreen-equalizer .equalizer-panel {
+    padding: 5px 7px;
+  }
+
+  .fullscreen-equalizer .equalizer-header {
+    margin-bottom: 4px;
+  }
+
+  .fullscreen-equalizer .equalizer-presets {
+    gap: 3px;
+    margin-bottom: 4px;
+  }
+
+  .fullscreen-equalizer .equalizer-presets button {
+    padding: 3px 5px;
+    font-size: 8px;
+  }
+
+  .fullscreen-library-panel {
+    top: 43px;
+    left: auto;
+    right: 10px;
+    bottom: max(7px, env(safe-area-inset-bottom));
+
+    width: min(320px, 48%);
+    padding: 10px;
+  }
+
+  .fullscreen-library-header {
+    margin-bottom: 8px;
+  }
+
+  .fullscreen-library-header h2 {
+    font-size: 14px;
+  }
+
+  .fullscreen-library-search {
+    margin-top: 8px;
+  }
+
+  .fullscreen-library-list {
+    margin-top: 8px;
+  }
+
+  .fullscreen-hint {
+    top: 40px;
+    font-size: 8px;
+  }
+}
+
+/* =========================================
+   PANTALLAS CON POCA ALTURA
+========================================= */
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .fullscreen-main {
+    padding-top: 35px;
+  }
+
+  .fullscreen-experience.controls-visible .fullscreen-main {
+    padding-bottom: 0;
+  }
+
+  .fullscreen-controls {
+    max-height: 39dvh;
+  }
+
+  .fullscreen-equalizer {
+    max-height: 90px;
+  }
+
+  .fullscreen-now-playing {
+    padding-top: 3px;
+    padding-bottom: 3px;
+  }
+
+  .fullscreen-track-icon {
+    margin: 5px 0;
+  }
+}
+
+/* =========================================
+   ACCESIBILIDAD
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .fullscreen-experience *,
+  .fullscreen-experience *::before,
+  .fullscreen-experience *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
