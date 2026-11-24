@@ -1,0 +1,121 @@
+
+/* =========================================================
+   ECHOPULSE - MOBILE REFINEMENT
+   Solo afecta pantallas pequeñas. Escritorio sin cambios.
+========================================================= */
+
+@media (max-width: 600px) {
+  /* El selector de modos ahora vive en una tarjeta independiente. */
+  .visualizer-stage {
+    height: 190px;
+    min-height: 190px;
+    overflow: hidden;
+  }
+
+  /* Tarjeta independiente para pantalla completa. */
+  .fullscreen-launch-row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-top: 11px;
+    padding: 13px;
+    border: 1px solid rgba(53, 231, 242, .2);
+    border-radius: 12px;
+    background: linear-gradient(145deg, rgba(19, 30, 51, .9), rgba(12, 17, 35, .94));
+  }
+
+  .fullscreen-launch-row > span {
+    min-width: 0;
+    font-size: 11px;
+    line-height: 1.45;
+    text-align: center;
+  }
+
+  .fullscreen-launch {
+    display: flex;
+    width: 100%;
+    min-height: 43px;
+    padding: 10px 14px;
+    font-size: 12px;
+  }
+
+  /* Presets del ecualizador: dos columnas estables. */
+  .equalizer-presets {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .equalizer-presets button {
+    min-width: 0;
+    min-height: 35px;
+    padding: 7px 5px;
+    white-space: normal;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  /* Evita que los cinco controles del ecualizador se aplasten. */
+  .equalizer-sliders {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: start;
+    gap: 4px;
+  }
+
+  .equalizer-band {
+    min-width: 0;
+  }
+
+  .equalizer-band input {
+    max-width: 78px;
+  }
+
+  .equalizer-band-info strong,
+  .equalizer-band-info span {
+    overflow-wrap: anywhere;
+  }
+
+  .fullscreen-equalizer .equalizer-presets {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 380px) {
+  .fullscreen-launch-row {
+    padding: 11px;
+  }
+
+  .equalizer-panel {
+    padding: 11px;
+  }
+
+  .equalizer-presets button {
+    font-size: 10px;
+  }
+
+  .fullscreen-visualizer .visualizer-toolbar {
+    max-height: 115px;
+    padding: 6px;
+  }
+
+  .fullscreen-visualizer .visualizer-modes {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 3px;
+  }
+
+  .fullscreen-visualizer .visualizer-modes button {
+    min-height: 25px;
+    padding: 4px 2px;
+    font-size: 7px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .visualizer-mode-card .visualizer-modes button,
+  .fullscreen-launch {
+    transition: none;
+  }
+}

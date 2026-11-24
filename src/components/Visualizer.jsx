@@ -10,7 +10,8 @@ const MODES = {
   mirror: 'NEON MIRROR',
   nebula: 'NEBULA',
   aurora: 'AURORA',
-  infinity: 'INFINITY STONES'
+  infinity: 'INFINITY STONES',
+  smoke: 'SMOKE FLOW'
 };
 
 const BASE_CYAN = '#35e7f2';
@@ -164,7 +165,8 @@ function Visualizer({
     mirror: tr('mode_mirror', 'ESPEJO NEÓN', 'NEON MIRROR'),
     nebula: tr('mode_nebula', 'NEBULOSA', 'NEBULA'),
     aurora: tr('mode_aurora', 'AURORA', 'AURORA'),
-    infinity: tr('mode_infinity', 'GEMAS DEL INFINITO', 'INFINITY STONES')
+    infinity: tr('mode_infinity', 'GEMAS DEL INFINITO', 'INFINITY STONES'),
+    smoke: tr('mode_smoke', 'HUMO', 'SMOKE FLOW')
   };
 
   useEffect(() => {
@@ -346,7 +348,7 @@ function Visualizer({
 
     const draw = (timestamp) => {
       const frameInterval =
-        mode === 'aurora' || mode === 'nebula' || mode === 'infinity'
+        mode === 'aurora' || mode === 'nebula' || mode === 'infinity' || mode === 'smoke'
           ? 1000 / 30
           : 0;
 
@@ -426,6 +428,9 @@ function Visualizer({
             equalizerValuesRef.current
           );
           break;
+        case 'smoke':
+          drawSmokeFlow(ctx, width, height, frequencyData, elapsed, getAverage, colors);
+          break;
         default:
           break;
       }
@@ -440,42 +445,6 @@ function Visualizer({
 
   return (
     <div className="visualizer-stage">
-      <div className="visualizer-toolbar">
-        <span className="visualizer-label">
-          {tr('visualizerTitle', 'ECHOPULSE VISUALIZADOR', 'ECHOPULSE VISUALIZER')}
-        </span>
-
-        <div className="visualizer-modes">
-          <button className={mode === 'classic' ? 'selected' : ''} onClick={() => setMode('classic')}>
-            {tr('spectrum', 'Espectro', 'Spectrum')}
-          </button>
-
-          <button className={mode === 'modern' ? 'selected' : ''} onClick={() => setMode('modern')}>
-            {tr('pulse', 'Pulso', 'Pulse')}
-          </button>
-
-          <button className={mode === 'waveform' ? 'selected' : ''} onClick={() => setMode('waveform')}>
-            {tr('waveform', 'Forma de onda', 'Waveform')}
-          </button>
-
-          <button className={mode === 'mirror' ? 'selected' : ''} onClick={() => setMode('mirror')}>
-            {tr('neonMirror', 'Espejo neón', 'Neon Mirror')}
-          </button>
-
-          <button className={mode === 'nebula' ? 'selected' : ''} onClick={() => setMode('nebula')}>
-            {tr('nebula', 'Nebulosa', 'Nebula')}
-          </button>
-
-          <button className={mode === 'aurora' ? 'selected' : ''} onClick={() => setMode('aurora')}>
-            {tr('aurora', 'Aurora', 'Aurora')}
-          </button>
-
-          <button className={mode === 'infinity' ? 'selected' : ''} onClick={() => setMode('infinity')}>
-            {tr('infinityStones', 'Gemas del infinito', 'Infinity Stones')}
-          </button>
-        </div>
-      </div>
-
       <canvas ref={canvasRef} />
 
       <div className="visualizer-footer">
@@ -828,6 +797,119 @@ function drawAurora(ctx, width, height, colors, energy, elapsed, strands) {
   ctx.restore();
 }
 
+function drawSmokeFlow(ctx, width, height, data, elapsed, getAverage, colors) {
+  const time = elapsed * 0.001;
+  const bass = getAverage(data, 1, Math.max(2, Math.floor(data.length * 0.12)));
+  const mids = getAverage(data, Math.floor(data.length * 0.12), Math.floor(data.length * 0.38));
+  const beat = 0.72 + bass * 0.9;
+  const scale = Math.min(width / 760, height / 300, 1.25);
+  const centerX = width * 0.5;
+  const centerY = height * 0.53;
+
+  // A soft, low-contrast vapor bed keeps the effect atmospheric rather than graphic.
+  const haze = ctx.createRadialGradient(centerX, centerY, 2, centerX, centerY, width * 0.46);
+  haze.addColorStop(0, 'rgba(205,214,224,0.075)');
+  haze.addColorStop(0.45, 'rgba(120,135,150,0.035)');
+  haze.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = haze;
+  ctx.fillRect(0, 0, width, height);
+
+  const rings = [
+    { x: centerX - width * 0.19 + Math.sin(time * 0.31) * width * 0.035, y: centerY + Math.cos(time * 0.27) * height * 0.09, r: Math.min(width, height) * 0.16, phase: 0.2, tilt: -0.16 },
+    { x: centerX + width * 0.16 + Math.cos(time * 0.24) * width * 0.04, y: centerY - height * 0.08 + Math.sin(time * 0.33) * height * 0.08, r: Math.min(width, height) * 0.125, phase: 2.1, tilt: 0.18 },
+    { x: centerX + Math.sin(time * 0.19) * width * 0.08, y: centerY + height * 0.19 + Math.cos(time * 0.22) * height * 0.035, r: Math.min(width, height) * 0.09, phase: 4.2, tilt: -0.08 }
+  ];
+
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+
+  rings.forEach((ring, ringIndex) => {
+    const pulse = 1 + Math.sin(time * 0.8 + ring.phase) * 0.045 + bass * 0.09;
+    const rx = ring.r * 1.42 * pulse;
+    const ry = ring.r * 0.55 * pulse;
+    const rotation = ring.tilt + Math.sin(time * 0.21 + ring.phase) * 0.08;
+    const hue = [colors.low, colors.mid, colors.high][ringIndex];
+
+    // Multiple translucent elliptical vapor layers create a soft volumetric ring.
+    for (let layer = 0; layer < 5; layer++) {
+      const spread = 1 + layer * 0.105;
+      const alpha = (0.055 - layer * 0.007) * (0.75 + mids * 0.7);
+      ctx.save();
+      ctx.translate(ring.x, ring.y);
+      ctx.rotate(rotation + layer * 0.025);
+      ctx.scale(1, 0.82 + layer * 0.035);
+      const gradient = ctx.createRadialGradient(0, 0, Math.max(1, ry * (0.34 + layer * 0.025)), 0, 0, rx * spread);
+      gradient.addColorStop(0, `rgba(225,232,238,${alpha * 0.12})`);
+      gradient.addColorStop(0.58, `rgba(190,200,210,${alpha})`);
+      gradient.addColorStop(0.82, `rgba(125,140,155,${alpha * 0.72})`);
+      gradient.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, rx * spread, ry * spread, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // Wispy curls around the ring, each with gently drifting turbulence.
+    for (let wisp = 0; wisp < 9; wisp++) {
+      const angle = (wisp / 9) * Math.PI * 2 + time * (0.16 + ringIndex * 0.025) * (wisp % 2 ? 1 : -1) + ring.phase;
+      const wobble = Math.sin(time * 0.72 + wisp * 1.7 + ring.phase) * ring.r * 0.11;
+      const x = ring.x + Math.cos(angle) * rx * 0.78;
+      const y = ring.y + Math.sin(angle) * ry * 0.82;
+      const curl = ring.r * (0.18 + 0.08 * Math.sin(time * 0.4 + wisp));
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.bezierCurveTo(
+        x + Math.cos(angle + 0.8) * curl + wobble,
+        y + Math.sin(angle + 0.8) * curl,
+        x + Math.cos(angle + 1.7) * curl * 1.8,
+        y + Math.sin(angle + 1.7) * curl * 1.8 + wobble,
+        x + Math.cos(angle + 2.4) * curl * 2.1,
+        y + Math.sin(angle + 2.4) * curl * 2.1
+      );
+      ctx.strokeStyle = `rgba(218,225,232,${0.10 + bass * 0.07})`;
+      ctx.lineWidth = Math.max(1, ring.r * 0.055);
+      ctx.shadowBlur = ring.r * 0.22;
+      ctx.shadowColor = 'rgba(205,215,225,0.38)';
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+
+    // Very restrained color reflections travel over the vapor, while the smoke stays grey.
+    ctx.save();
+    ctx.translate(ring.x, ring.y);
+    ctx.rotate(rotation);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, rx * 0.98, ry * 0.9, 0, Math.PI * (0.08 + ringIndex * 0.12), Math.PI * (0.62 + ringIndex * 0.12));
+    ctx.strokeStyle = hue;
+    ctx.globalAlpha = 0.13 + mids * 0.1;
+    ctx.lineWidth = Math.max(1, ring.r * 0.07);
+    ctx.shadowBlur = ring.r * 0.35;
+    ctx.shadowColor = hue;
+    ctx.stroke();
+    ctx.restore();
+  });
+
+  // Small vapor wisps drift upward and dissolve around the rings.
+  for (let i = 0; i < 34; i++) {
+    const seed = i * 12.9898;
+    const drift = (time * (5 + (i % 5) * 1.7) + seed) % (height * 0.8);
+    const x = (i * 73.17 + Math.sin(time * 0.3 + i) * width * 0.045) % width;
+    const y = height - drift;
+    const radius = (5 + (i % 7) * 2.3) * scale * (1 + bass * 0.35);
+    const puff = ctx.createRadialGradient(x, y, 0, x, y, radius * 2.5);
+    puff.addColorStop(0, 'rgba(220,226,232,0.075)');
+    puff.addColorStop(0.45, 'rgba(170,182,194,0.035)');
+    puff.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = puff;
+    ctx.beginPath();
+    ctx.arc(x, y, radius * 2.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.restore();
+}
+
 function drawInfinityStones(
   ctx,
   width,
@@ -1133,6 +1215,52 @@ function drawMirror(ctx, width, height, data, colors) {
 
   ctx.shadowBlur = 0;
   ctx.restore();
+}
+
+export function VisualizerModeSelector({ mode, onModeChange, language = 'es' }) {
+  const tr = (key, spanish, english) => {
+    const translated = t(language, key);
+    if (!translated || translated === key) return language === 'en' ? english : spanish;
+    return translated;
+  };
+
+  const modes = [
+    ['classic', 'spectrum', 'Espectro', 'Spectrum'],
+    ['modern', 'pulse', 'Pulso', 'Pulse'],
+    ['waveform', 'waveform', 'Forma de onda', 'Waveform'],
+    ['mirror', 'neonMirror', 'Espejo neón', 'Neon Mirror'],
+    ['nebula', 'nebula', 'Nebulosa', 'Nebula'],
+    ['aurora', 'aurora', 'Aurora', 'Aurora'],
+    ['infinity', 'infinityStones', 'Gemas del infinito', 'Infinity Stones'],
+    ['smoke', 'smokeFlow', 'Humo', 'Smoke Flow']
+  ];
+
+  return (
+    <section className="visualizer-mode-card" aria-label={tr('visualizerTitle', 'Modos del visualizador', 'Visualizer modes')}>
+      <div className="visualizer-mode-card-header">
+        <div>
+          <span className="visualizer-mode-eyebrow">ECHOPULSE</span>
+          <h3>{tr('visualizerTitle', 'Modos de visualización', 'Visualizer modes')}</h3>
+        </div>
+        <span className="visualizer-mode-current">
+          {modes.find(([id]) => id === mode)?.[2 + (language === 'en' ? 1 : 0)] || 'Espectro'}
+        </span>
+      </div>
+      <div className="visualizer-modes">
+        {modes.map(([id, key, spanish, english]) => (
+          <button
+            key={id}
+            type="button"
+            className={mode === id ? 'selected' : ''}
+            onClick={() => onModeChange(id)}
+            aria-pressed={mode === id}
+          >
+            {tr(key, spanish, english)}
+          </button>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 export default Visualizer;

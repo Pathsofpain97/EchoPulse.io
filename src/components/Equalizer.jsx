@@ -73,16 +73,23 @@ function Equalizer({
         </button>
       </div>
 
-      <div className="equalizer-presets">
-        {Object.keys(presets).map(name => (
-          <button
-            key={name}
-            className={preset === name ? 'active' : ''}
-            onClick={() => handlePreset(name)}
-          >
-            {t(language, `presets.${name}`)}
-          </button>
-        ))}
+      <div className="equalizer-presets-card">
+        <div className="equalizer-presets-heading">
+          {language === 'en' ? 'SOUND PRESETS' : 'PERFILES DE SONIDO'}
+        </div>
+        <div className="equalizer-presets">
+          {Object.keys(presets).map(name => (
+            <button
+              key={name}
+              type="button"
+              className={preset === name ? 'active' : ''}
+              onClick={() => handlePreset(name)}
+              aria-pressed={preset === name}
+            >
+              {t(language, `presets.${name}`)}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="equalizer-sliders">

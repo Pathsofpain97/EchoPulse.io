@@ -17,12 +17,14 @@ import {
   Compass
 } from 'lucide-react';
 
-import Visualizer from './Visualizer';
+import Visualizer, { VisualizerModeSelector } from './Visualizer';
 import Equalizer from './Equalizer';
 import { t } from './i18n/translations';
 
 import '../styles/player.css';
 import '../styles/fullscreen.css';
+import '../styles/mobile-refinement.css';
+import '../styles/control-cards.css';
 
 function Player({ language = 'es', onLanguageChange = () => {}, initialSection = 'local' }) {
   const audioRef = useRef(null);
@@ -730,6 +732,14 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
           </div>
         </div>
 
+        {!isFullscreen && (
+          <VisualizerModeSelector
+            mode={visualizerMode}
+            onModeChange={setVisualizerMode}
+            language={language}
+          />
+        )}
+
         <div className="current-track">
           <h2>{currentSong ? currentSong.name : tr('nothingPlaying', 'Nada reproduciéndose', 'Nothing playing')}</h2>
           <p>
@@ -899,6 +909,11 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
                 analyser={analyser}
                 preset={equalizerPreset}
                 equalizerValues={equalizerValues}
+                mode={visualizerMode}
+                onModeChange={setVisualizerMode}
+                language={language}
+              />
+              <VisualizerModeSelector
                 mode={visualizerMode}
                 onModeChange={setVisualizerMode}
                 language={language}

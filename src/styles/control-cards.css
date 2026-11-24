@@ -1,0 +1,300 @@
+/* =========================================================
+   ECHOPULSE - CONTROLES EN TARJETAS INDEPENDIENTES
+   Los controles dejan de compartir espacio con el canvas.
+========================================================= */
+
+.visualizer-mode-card,
+.equalizer-presets-card {
+  width: 100%;
+  min-width: 0;
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid rgba(153, 92, 255, 0.24);
+  border-radius: 13px;
+  background: linear-gradient(145deg, rgba(18, 25, 49, 0.96), rgba(11, 16, 35, 0.97));
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255,255,255,0.025);
+}
+
+.visualizer-mode-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.visualizer-mode-card-header h3 {
+  margin: 3px 0 0;
+  color: #f4f4ff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.visualizer-mode-eyebrow,
+.equalizer-presets-heading {
+  color: #8d9fbe;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+}
+
+.visualizer-mode-current {
+  max-width: 48%;
+  padding: 6px 9px;
+  overflow-wrap: anywhere;
+  color: #c9b4ff;
+  background: rgba(153, 92, 255, 0.12);
+  border: 1px solid rgba(153, 92, 255, 0.25);
+  border-radius: 7px;
+  font-size: 9px;
+  text-align: center;
+}
+
+.visualizer-mode-card .visualizer-modes {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+  width: 100%;
+  max-width: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.visualizer-mode-card .visualizer-modes button {
+  min-width: 0;
+  min-height: 36px;
+  padding: 8px 6px;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  line-height: 1.2;
+  color: #aeb6d2;
+  background: rgba(7, 11, 27, 0.58);
+  border: 1px solid rgba(126, 117, 255, 0.2);
+  border-radius: 8px;
+  font-size: 10px;
+}
+
+.visualizer-mode-card .visualizer-modes button.selected {
+  color: #fff;
+  border-color: rgba(193, 163, 255, 0.55);
+  background: linear-gradient(110deg, rgba(153, 92, 255, 0.88), rgba(104, 72, 232, 0.92));
+  box-shadow: 0 0 12px rgba(153, 92, 255, 0.2);
+}
+
+.equalizer-presets-card {
+  margin: 0 0 18px;
+  padding: 12px;
+  border-color: var(--eq-border);
+  background: linear-gradient(145deg, rgba(9, 15, 34, 0.68), rgba(17, 20, 43, 0.78));
+  box-shadow: none;
+}
+
+.equalizer-presets-heading {
+  margin-bottom: 10px;
+  color: var(--eq-accent);
+}
+
+.equalizer-presets-card .equalizer-presets {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 7px;
+  margin: 0;
+}
+
+.equalizer-presets-card .equalizer-presets button {
+  min-width: 0;
+  min-height: 34px;
+  padding: 7px 5px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.15;
+  font-size: 10px;
+}
+
+/* El visualizador en pantalla completa conserva su propio lienzo;
+   la tarjeta de modos queda debajo, dentro de la misma columna. */
+.fullscreen-visualizer {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.fullscreen-visualizer > .visualizer-stage {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.fullscreen-visualizer > .visualizer-mode-card {
+  flex: 0 0 auto;
+  margin-top: 0;
+  padding: 10px 12px;
+}
+
+.fullscreen-visualizer > .visualizer-mode-card .visualizer-mode-card-header {
+  margin-bottom: 8px;
+}
+
+.fullscreen-visualizer > .visualizer-mode-card .visualizer-modes {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.fullscreen-visualizer > .visualizer-mode-card .visualizer-modes button {
+  min-height: 30px;
+  padding: 5px 4px;
+  font-size: 9px;
+}
+
+@media (max-width: 700px) {
+  .visualizer-mode-card .visualizer-modes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .equalizer-presets-card .equalizer-presets {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .equalizer-panel {
+    padding: 13px;
+  }
+
+  .equalizer-sliders {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .equalizer-band {
+    min-width: 0;
+  }
+
+  .equalizer-band input {
+    width: 100%;
+    max-width: 76px;
+  }
+
+  .equalizer-band-info p {
+    display: none;
+  }
+
+  .fullscreen-visualizer {
+    gap: 7px;
+  }
+
+  .fullscreen-visualizer > .visualizer-stage {
+    flex: 1 1 0;
+    min-height: 130px;
+  }
+
+  .fullscreen-visualizer > .visualizer-mode-card {
+    padding: 8px;
+  }
+
+  .fullscreen-visualizer > .visualizer-mode-card .visualizer-mode-card-header h3 {
+    font-size: 11px;
+  }
+
+  .fullscreen-visualizer > .visualizer-mode-card .visualizer-modes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .fullscreen-visualizer > .visualizer-mode-card .visualizer-modes button {
+    min-height: 28px;
+    padding: 5px 4px;
+    font-size: 9px;
+  }
+
+  .fullscreen-equalizer .equalizer-presets-card .equalizer-presets {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 380px) {
+  .visualizer-mode-card,
+  .equalizer-presets-card {
+    padding: 10px;
+  }
+
+  .visualizer-mode-card .visualizer-modes button,
+  .equalizer-presets-card .equalizer-presets button {
+    font-size: 9px;
+  }
+
+  .equalizer-panel {
+    padding: 10px;
+  }
+
+  .fullscreen-visualizer > .visualizer-mode-card .visualizer-modes button {
+    font-size: 8px;
+  }
+}
+
+/* iPad mini y tablets en vertical: sus 768px de ancho no entran
+   en los breakpoints habituales de teléfono, por eso se trata aparte. */
+@media (max-width: 850px) and (orientation: portrait) {
+  .visualizer-mode-card .visualizer-modes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .equalizer-presets-card .equalizer-presets {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .equalizer-presets-card .equalizer-presets button {
+    min-height: 38px;
+    font-size: 11px;
+  }
+
+  .fullscreen-main {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 10px;
+    padding-top: 58px;
+  }
+
+  .fullscreen-visualizer {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .fullscreen-visualizer > .visualizer-stage {
+    min-height: 150px;
+  }
+
+  .fullscreen-visualizer > .visualizer-mode-card .visualizer-modes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fullscreen-experience.controls-visible .fullscreen-main {
+    padding-bottom: 34vh;
+  }
+
+  .fullscreen-controls {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    max-height: 33vh;
+    overflow-y: auto;
+    padding: 10px 12px;
+  }
+
+  .fullscreen-playback {
+    gap: 8px;
+  }
+
+  .fullscreen-equalizer {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .fullscreen-equalizer .equalizer-panel {
+    padding: 9px;
+  }
+
+  .fullscreen-equalizer .equalizer-presets-card .equalizer-presets {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

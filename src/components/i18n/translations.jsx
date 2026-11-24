@@ -87,7 +87,8 @@ export const translations = {
       mirror: 'Espejo neón',
       nebula: 'Nebulosa',
       aurora: 'Aurora',
-      infinity: 'Gemas del infinito'
+      infinity: 'Gemas del infinito',
+      smokeFlow: 'Humo'
     },
     audioAnalyzerActive: 'ANALIZADOR DE AUDIO ACTIVO',
     waitingForAudio: 'ESPERANDO AUDIO'
@@ -180,7 +181,8 @@ export const translations = {
       mirror: 'Neon Mirror',
       nebula: 'Nebula',
       aurora: 'Aurora',
-      infinity: 'Infinity Stones'
+      infinity: 'Infinity Stones',
+      smokeFlow: 'Smoke Flow'
     },
     audioAnalyzerActive: 'AUDIO ANALYZER ACTIVE',
     waitingForAudio: 'WAITING FOR AUDIO'
