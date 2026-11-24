@@ -13,7 +13,8 @@ import {
   Trash2,
   Maximize,
   X,
-  Search
+  Search,
+  Compass
 } from 'lucide-react';
 
 import Visualizer from './Visualizer';
@@ -23,7 +24,7 @@ import { t } from './i18n/translations';
 import '../styles/player.css';
 import '../styles/fullscreen.css';
 
-function Player({ language = 'es', onLanguageChange = () => {} }) {
+function Player({ language = 'es', onLanguageChange = () => {}, initialSection = 'local' }) {
   const audioRef = useRef(null);
   const fileInputRef = useRef(null);
   const shouldAutoPlayRef = useRef(false);
@@ -52,6 +53,7 @@ function Player({ language = 'es', onLanguageChange = () => {} }) {
   const [showFullscreenControls, setShowFullscreenControls] = useState(true);
   const [showFullscreenLibrary, setShowFullscreenLibrary] = useState(false);
   const [librarySearch, setLibrarySearch] = useState('');
+  const [activeSection, setActiveSection] = useState(initialSection);
   const [libraryNotice, setLibraryNotice] = useState(null);
 
   songsRef.current = songs;
@@ -669,6 +671,29 @@ function Player({ language = 'es', onLanguageChange = () => {} }) {
         {languageSelector}
       </header>
 
+      {!isFullscreen && (
+        <nav className="source-navigation" aria-label={language === 'en' ? 'Music sections' : 'Secciones de música'}>
+          <button
+            type="button"
+            className={activeSection === 'local' ? 'active' : ''}
+            onClick={() => setActiveSection('local')}
+            aria-pressed={activeSection === 'local'}
+          >
+            <FolderOpen size={17} />
+            {language === 'en' ? 'My music' : 'Mi música'}
+          </button>
+          <button
+            type="button"
+            className={activeSection === 'discover' ? 'active' : ''}
+            onClick={() => setActiveSection('discover')}
+            aria-pressed={activeSection === 'discover'}
+          >
+            <Compass size={17} />
+            {language === 'en' ? 'Discover music' : 'Descubrir música'}
+          </button>
+        </nav>
+      )}
+
       <section className="music-player">
         <div className="visualizer-section">
           <div className="visualizer-area">
@@ -770,6 +795,7 @@ function Player({ language = 'es', onLanguageChange = () => {} }) {
         language={language}
       />
 
+      {activeSection === 'local' ? (
       <section className="playlist-panel">
         <div className="playlist-header">
           <div>
@@ -812,6 +838,22 @@ function Player({ language = 'es', onLanguageChange = () => {} }) {
           {renderSongList()}
         </div>
       </section>
+      ) : (
+        <section className="discover-placeholder">
+          <div className="discover-placeholder-icon"><Compass size={31} /></div>
+          <span className="discover-placeholder-eyebrow">AUDIUS</span>
+          <h2>{language === 'en' ? 'Discover new music' : 'Descubrí música nueva'}</h2>
+          <p>
+            {language === 'en'
+              ? 'The Audius catalog connection is the next step. Your local music library and player are ready to use in the meantime.'
+              : 'La conexión con el catálogo de Audius es el próximo paso. Mientras tanto, tu biblioteca local y el reproductor siguen disponibles.'}
+          </p>
+          <button type="button" onClick={() => setActiveSection('local')}>
+            <FolderOpen size={17} />
+            {language === 'en' ? 'Go to my music' : 'Ir a mi música'}
+          </button>
+        </section>
+      )}
 
       {isFullscreen && (
         <section

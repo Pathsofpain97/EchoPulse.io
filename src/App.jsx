@@ -5,6 +5,7 @@ import './styles/global.css';
 
 import Player from './components/Player';
 import Intro from './components/Intro';
+import SourceSelection from './components/SourceSelection';
 
 function getInitialLanguage() {
   try {
@@ -18,10 +19,15 @@ function getInitialLanguage() {
 
 function App() {
   const [showIntro, setShowIntro] = useState(true);
+  const [selectedSource, setSelectedSource] = useState(null);
   const [language, setLanguage] = useState(getInitialLanguage);
 
   const handleIntroComplete = useCallback(() => {
     setShowIntro(false);
+  }, []);
+
+  const handleSourceSelect = useCallback((source) => {
+    setSelectedSource(source);
   }, []);
 
   const handleLanguageChange = useCallback((nextLanguage) => {
@@ -40,13 +46,20 @@ function App() {
 
   return (
     <>
-      <Player
-        language={language}
-        onLanguageChange={handleLanguageChange}
-      />
-
-      {showIntro && (
+      {showIntro ? (
         <Intro onComplete={handleIntroComplete} />
+      ) : selectedSource ? (
+        <Player
+          language={language}
+          onLanguageChange={handleLanguageChange}
+          initialSection={selectedSource}
+        />
+      ) : (
+        <SourceSelection
+          language={language}
+          onLanguageChange={handleLanguageChange}
+          onSelect={handleSourceSelect}
+        />
       )}
     </>
   );
