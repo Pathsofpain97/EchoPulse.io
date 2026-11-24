@@ -20,6 +20,7 @@ import {
 import Visualizer, { VisualizerModeSelector } from './Visualizer';
 import Equalizer from './Equalizer';
 import { t } from './i18n/translations';
+import echoPulseLogo from '../assets/EchoPulse.png';
 
 import '../styles/player.css';
 import '../styles/fullscreen.css';
@@ -663,8 +664,11 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
       <header className="player-header">
         <div className="player-header-main">
           <div className="player-brand">
-            <Music2 size={27} />
-            <h1>EchoPulse</h1>
+            <img
+              className="player-brand-logo"
+              src={echoPulseLogo}
+              alt="EchoPulse"
+            />
           </div>
 
           <span className="player-status">MUSIC PLAYER</span>

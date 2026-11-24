@@ -374,7 +374,7 @@ function Visualizer({
         return;
       }
 
-      const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.25);
+      const pixelRatio = mode === 'smoke' ? 1 : Math.min(window.devicePixelRatio || 1, 1.25);
       const canvasWidth = Math.round(width * pixelRatio);
       const canvasHeight = Math.round(height * pixelRatio);
 
@@ -798,114 +798,87 @@ function drawAurora(ctx, width, height, colors, energy, elapsed, strands) {
 }
 
 function drawSmokeFlow(ctx, width, height, data, elapsed, getAverage, colors) {
-  const time = elapsed * 0.001;
+  // A single dense chimney-like plume: broad translucent layers, very few
+  // canvas operations per frame to keep tablets and phones responsive.
+  const time = elapsed * 0.00022;
   const bass = getAverage(data, 1, Math.max(2, Math.floor(data.length * 0.12)));
-  const mids = getAverage(data, Math.floor(data.length * 0.12), Math.floor(data.length * 0.38));
-  const beat = 0.72 + bass * 0.9;
-  const scale = Math.min(width / 760, height / 300, 1.25);
-  const centerX = width * 0.5;
-  const centerY = height * 0.53;
-
-  // A soft, low-contrast vapor bed keeps the effect atmospheric rather than graphic.
-  const haze = ctx.createRadialGradient(centerX, centerY, 2, centerX, centerY, width * 0.46);
-  haze.addColorStop(0, 'rgba(205,214,224,0.075)');
-  haze.addColorStop(0.45, 'rgba(120,135,150,0.035)');
-  haze.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = haze;
-  ctx.fillRect(0, 0, width, height);
-
-  const rings = [
-    { x: centerX - width * 0.19 + Math.sin(time * 0.31) * width * 0.035, y: centerY + Math.cos(time * 0.27) * height * 0.09, r: Math.min(width, height) * 0.16, phase: 0.2, tilt: -0.16 },
-    { x: centerX + width * 0.16 + Math.cos(time * 0.24) * width * 0.04, y: centerY - height * 0.08 + Math.sin(time * 0.33) * height * 0.08, r: Math.min(width, height) * 0.125, phase: 2.1, tilt: 0.18 },
-    { x: centerX + Math.sin(time * 0.19) * width * 0.08, y: centerY + height * 0.19 + Math.cos(time * 0.22) * height * 0.035, r: Math.min(width, height) * 0.09, phase: 4.2, tilt: -0.08 }
-  ];
+  const energy = 0.88 + bass * 0.22;
+  const cx = width * 0.5;
+  const baseY = height * 1.08;
+  const plumeHeight = height * 0.98;
+  const sway = Math.sin(time * 0.72) * width * 0.045;
+  const color = colors.mid || '#35e7f2';
 
   ctx.save();
   ctx.globalCompositeOperation = 'screen';
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
 
-  rings.forEach((ring, ringIndex) => {
-    const pulse = 1 + Math.sin(time * 0.8 + ring.phase) * 0.045 + bass * 0.09;
-    const rx = ring.r * 1.42 * pulse;
-    const ry = ring.r * 0.55 * pulse;
-    const rotation = ring.tilt + Math.sin(time * 0.21 + ring.phase) * 0.08;
-    const hue = [colors.low, colors.mid, colors.high][ringIndex];
+  // Broad central body. The overlapping translucent strokes create a
+  // continuous, soft-edged column rather than separate bubbles or rings.
+  const layers = [
+    { offset: -0.10, width: 0.20, alpha: 0.055, phase: 0.0 },
+    { offset: 0.04, width: 0.16, alpha: 0.075, phase: 1.1 },
+    { offset: 0.16, width: 0.115, alpha: 0.085, phase: 2.0 },
+    { offset: -0.19, width: 0.095, alpha: 0.065, phase: 2.8 },
+    { offset: 0.27, width: 0.065, alpha: 0.055, phase: 3.7 }
+  ];
 
-    // Multiple translucent elliptical vapor layers create a soft volumetric ring.
-    for (let layer = 0; layer < 5; layer++) {
-      const spread = 1 + layer * 0.105;
-      const alpha = (0.055 - layer * 0.007) * (0.75 + mids * 0.7);
-      ctx.save();
-      ctx.translate(ring.x, ring.y);
-      ctx.rotate(rotation + layer * 0.025);
-      ctx.scale(1, 0.82 + layer * 0.035);
-      const gradient = ctx.createRadialGradient(0, 0, Math.max(1, ry * (0.34 + layer * 0.025)), 0, 0, rx * spread);
-      gradient.addColorStop(0, `rgba(225,232,238,${alpha * 0.12})`);
-      gradient.addColorStop(0.58, `rgba(190,200,210,${alpha})`);
-      gradient.addColorStop(0.82, `rgba(125,140,155,${alpha * 0.72})`);
-      gradient.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, rx * spread, ry * spread, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
+  layers.forEach((layer, index) => {
+    const drift = Math.sin(time + layer.phase) * width * 0.035;
+    const drift2 = Math.sin(time * 0.63 + layer.phase + 1.7) * width * 0.025;
+    const x0 = cx + sway * 0.25 + layer.offset * width * 0.12;
+    const x1 = cx + drift - layer.offset * width * 0.06;
+    const x2 = cx + drift2 + layer.offset * width * 0.08;
+    const x3 = cx + sway + Math.sin(time * 0.48 + layer.phase) * width * 0.055;
+    const lineWidth = Math.max(12, width * layer.width * energy);
 
-    // Wispy curls around the ring, each with gently drifting turbulence.
-    for (let wisp = 0; wisp < 9; wisp++) {
-      const angle = (wisp / 9) * Math.PI * 2 + time * (0.16 + ringIndex * 0.025) * (wisp % 2 ? 1 : -1) + ring.phase;
-      const wobble = Math.sin(time * 0.72 + wisp * 1.7 + ring.phase) * ring.r * 0.11;
-      const x = ring.x + Math.cos(angle) * rx * 0.78;
-      const y = ring.y + Math.sin(angle) * ry * 0.82;
-      const curl = ring.r * (0.18 + 0.08 * Math.sin(time * 0.4 + wisp));
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.bezierCurveTo(
-        x + Math.cos(angle + 0.8) * curl + wobble,
-        y + Math.sin(angle + 0.8) * curl,
-        x + Math.cos(angle + 1.7) * curl * 1.8,
-        y + Math.sin(angle + 1.7) * curl * 1.8 + wobble,
-        x + Math.cos(angle + 2.4) * curl * 2.1,
-        y + Math.sin(angle + 2.4) * curl * 2.1
-      );
-      ctx.strokeStyle = `rgba(218,225,232,${0.10 + bass * 0.07})`;
-      ctx.lineWidth = Math.max(1, ring.r * 0.055);
-      ctx.shadowBlur = ring.r * 0.22;
-      ctx.shadowColor = 'rgba(205,215,225,0.38)';
-      ctx.stroke();
-      ctx.shadowBlur = 0;
-    }
+    const gradient = ctx.createLinearGradient(x0 - lineWidth, 0, x0 + lineWidth, 0);
+    gradient.addColorStop(0, 'rgba(175,185,198,0)');
+    gradient.addColorStop(0.28, `rgba(205,213,222,${layer.alpha * 0.7})`);
+    gradient.addColorStop(0.52, `rgba(245,247,250,${layer.alpha * 1.25})`);
+    gradient.addColorStop(0.76, `rgba(175,190,207,${layer.alpha * 0.65})`);
+    gradient.addColorStop(1, 'rgba(150,165,180,0)');
 
-    // Very restrained color reflections travel over the vapor, while the smoke stays grey.
-    ctx.save();
-    ctx.translate(ring.x, ring.y);
-    ctx.rotate(rotation);
     ctx.beginPath();
-    ctx.ellipse(0, 0, rx * 0.98, ry * 0.9, 0, Math.PI * (0.08 + ringIndex * 0.12), Math.PI * (0.62 + ringIndex * 0.12));
-    ctx.strokeStyle = hue;
-    ctx.globalAlpha = 0.13 + mids * 0.1;
-    ctx.lineWidth = Math.max(1, ring.r * 0.07);
-    ctx.shadowBlur = ring.r * 0.35;
-    ctx.shadowColor = hue;
+    ctx.moveTo(x0, baseY);
+    ctx.bezierCurveTo(
+      x0 - drift * 0.3, baseY - plumeHeight * 0.28,
+      x1 + Math.sin(time * 0.8 + layer.phase) * width * 0.06, baseY - plumeHeight * 0.43,
+      x1, baseY - plumeHeight * 0.56
+    );
+    ctx.bezierCurveTo(
+      x1 - Math.sin(time * 0.7 + layer.phase) * width * 0.08, baseY - plumeHeight * 0.72,
+      x2 + Math.cos(time * 0.55 + layer.phase) * width * 0.08, baseY - plumeHeight * 0.78,
+      x3, baseY - plumeHeight * (0.9 + 0.025 * Math.sin(time + layer.phase))
+    );
+    ctx.strokeStyle = gradient;
+    ctx.globalAlpha = 1;
+    ctx.lineWidth = lineWidth;
     ctx.stroke();
-    ctx.restore();
   });
 
-  // Small vapor wisps drift upward and dissolve around the rings.
-  for (let i = 0; i < 34; i++) {
-    const seed = i * 12.9898;
-    const drift = (time * (5 + (i % 5) * 1.7) + seed) % (height * 0.8);
-    const x = (i * 73.17 + Math.sin(time * 0.3 + i) * width * 0.045) % width;
-    const y = height - drift;
-    const radius = (5 + (i % 7) * 2.3) * scale * (1 + bass * 0.35);
-    const puff = ctx.createRadialGradient(x, y, 0, x, y, radius * 2.5);
-    puff.addColorStop(0, 'rgba(220,226,232,0.075)');
-    puff.addColorStop(0.45, 'rgba(170,182,194,0.035)');
-    puff.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = puff;
-    ctx.beginPath();
-    ctx.arc(x, y, radius * 2.5, 0, Math.PI * 2);
-    ctx.fill();
-  }
+  // Soft pale core and subtle moving color reflection. No blur filters,
+  // particle clouds, per-particle gradients or expensive shadow effects.
+  const coreX = cx + sway * 0.72;
+  const coreGradient = ctx.createLinearGradient(coreX - width * 0.045, 0, coreX + width * 0.045, 0);
+  coreGradient.addColorStop(0, 'rgba(230,236,244,0)');
+  coreGradient.addColorStop(0.5, `rgba(238,242,248,${0.12 + bass * 0.035})`);
+  coreGradient.addColorStop(1, 'rgba(220,230,240,0)');
+  ctx.beginPath();
+  ctx.moveTo(coreX, baseY);
+  ctx.bezierCurveTo(coreX - sway, baseY - plumeHeight * 0.35, coreX + sway * 0.6, baseY - plumeHeight * 0.62, coreX + sway * 0.35, baseY - plumeHeight * 0.98);
+  ctx.strokeStyle = coreGradient;
+  ctx.lineWidth = Math.max(5, width * 0.075);
+  ctx.stroke();
+
+  ctx.globalAlpha = 0.10 + bass * 0.045;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = Math.max(2, width * 0.012);
+  ctx.beginPath();
+  ctx.moveTo(cx - sway * 0.15, baseY - plumeHeight * 0.12);
+  ctx.bezierCurveTo(cx + sway, baseY - plumeHeight * 0.42, cx - sway * 0.5, baseY - plumeHeight * 0.65, cx + sway * 0.7, baseY - plumeHeight * 0.88);
+  ctx.stroke();
 
   ctx.restore();
 }
