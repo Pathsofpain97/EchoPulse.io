@@ -19,6 +19,7 @@ import {
 
 import Visualizer, { VisualizerModeSelector } from './Visualizer';
 import Equalizer from './Equalizer';
+import AudiusExplorer from './AudiusExplorer';
 import { t } from './i18n/translations';
 import echoPulseLogo from '../assets/EchoPulse.png';
 
@@ -57,6 +58,9 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
   const [showFullscreenLibrary, setShowFullscreenLibrary] = useState(false);
   const [librarySearch, setLibrarySearch] = useState('');
   const [activeSection, setActiveSection] = useState(initialSection);
+  const [currentAudiusSong, setCurrentAudiusSong] = useState(null);
+  const [audiusQueue, setAudiusQueue] = useState([]);
+  const [audiusIndex, setAudiusIndex] = useState(0);
   const [libraryNotice, setLibraryNotice] = useState(null);
 
   songsRef.current = songs;
@@ -69,7 +73,7 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
     return translated;
   };
 
-  const currentSong = songs[currentIndex];
+  const currentSong = currentAudiusSong || songs[currentIndex];
 
   const filteredSongs = songs
     .map((song, index) => ({ ...song, originalIndex: index }))
@@ -290,7 +294,12 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
   };
 
   const playSong = (index) => {
-    if (index === currentIndex) {
+    const wasPlayingAudius = Boolean(currentAudiusSong);
+    setCurrentAudiusSong(null);
+    setAudiusQueue([]);
+    setAudiusIndex(0);
+
+    if (index === currentIndex && !wasPlayingAudius) {
       if (audioRef.current?.paused) togglePlay();
       return;
     }
@@ -299,7 +308,33 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
     setCurrentIndex(index);
   };
 
+  const playAudiusTrack = (track, queue) => {
+    const context = initializeAudioGraph();
+    if (context?.state === 'suspended') context.resume();
+
+    const normalizedQueue = (queue || [track]).filter(Boolean);
+    const selectedIndex = Math.max(0, normalizedQueue.findIndex(item => item.id === track.id));
+    setAudiusQueue(normalizedQueue);
+    setAudiusIndex(selectedIndex);
+    setCurrentAudiusSong(track);
+    shouldAutoPlayRef.current = true;
+    setIsPlaying(false);
+  };
+
   const nextSong = () => {
+    if (currentAudiusSong && audiusQueue.length > 0) {
+      if (audiusQueue.length === 1) {
+        const audio = audioRef.current;
+        if (audio) { audio.currentTime = 0; audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false)); }
+        return;
+      }
+      const nextIndex = (audiusIndex + 1) % audiusQueue.length;
+      setAudiusIndex(nextIndex);
+      setCurrentAudiusSong(audiusQueue[nextIndex]);
+      shouldAutoPlayRef.current = true;
+      return;
+    }
+
     if (songs.length === 0) return;
 
     if (songs.length === 1) {
@@ -320,6 +355,16 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
   };
 
   const previousSong = () => {
+    if (currentAudiusSong && audiusQueue.length > 0) {
+      const audio = audioRef.current;
+      if (audio && audio.currentTime > 3) { audio.currentTime = 0; return; }
+      const previousIndex = (audiusIndex - 1 + audiusQueue.length) % audiusQueue.length;
+      setAudiusIndex(previousIndex);
+      setCurrentAudiusSong(audiusQueue[previousIndex]);
+      shouldAutoPlayRef.current = true;
+      return;
+    }
+
     if (songs.length === 0) return;
 
     const audio = audioRef.current;
@@ -413,7 +458,7 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
     const target = event?.target;
 
     const isOverInteractiveArea = target?.closest?.(
-      '.fullscreen-controls, .fullscreen-topbar, .visualizer-toolbar, .fullscreen-library-panel'
+      '.fullscreen-controls, .fullscreen-topbar, .visualizer-toolbar, .visualizer-mode-card, .fullscreen-library-panel'
     );
 
     if (isOverInteractiveArea || showFullscreenLibrary) return;
@@ -642,10 +687,11 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
 
   return (
     <main
-      className={`player-layout ${isFullscreen ? 'fullscreen-active' : ''}`}
+      className={`player-layout source-${activeSection} ${isFullscreen ? 'fullscreen-active' : ''}`}
       ref={playerLayoutRef}
     >
       <audio
+        crossOrigin="anonymous"
         ref={audioRef}
         onTimeUpdate={updateProgress}
         onLoadedMetadata={updateDuration}
@@ -667,8 +713,11 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
             <img
               className="player-brand-logo"
               src={echoPulseLogo}
-              alt="EchoPulse"
+              alt=""
+              aria-hidden="true"
             />
+            <Music2 className="player-brand-music" size={23} aria-hidden="true" />
+            <h1>EchoPulse</h1>
           </div>
 
           <span className="player-status">MUSIC PLAYER</span>
@@ -681,7 +730,7 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
         <nav className="source-navigation" aria-label={language === 'en' ? 'Music sections' : 'Secciones de música'}>
           <button
             type="button"
-            className={activeSection === 'local' ? 'active' : ''}
+            className={`source-nav-local ${activeSection === 'local' ? 'active' : ''}`}
             onClick={() => setActiveSection('local')}
             aria-pressed={activeSection === 'local'}
           >
@@ -690,7 +739,7 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
           </button>
           <button
             type="button"
-            className={activeSection === 'discover' ? 'active' : ''}
+            className={`source-nav-discover ${activeSection === 'discover' ? 'active' : ''}`}
             onClick={() => setActiveSection('discover')}
             aria-pressed={activeSection === 'discover'}
           >
@@ -748,7 +797,7 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
           <h2>{currentSong ? currentSong.name : tr('nothingPlaying', 'Nada reproduciéndose', 'Nothing playing')}</h2>
           <p>
             {currentSong
-              ? tr('nowPlaying', 'Reproduciendo ahora', 'Now playing')
+              ? (currentSong.artist || tr('nowPlaying', 'Reproduciendo ahora', 'Now playing'))
               : tr('selectSong', 'Seleccioná una canción para comenzar', 'Select a song to get started')}
           </p>
         </div>
@@ -853,20 +902,7 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
         </div>
       </section>
       ) : (
-        <section className="discover-placeholder">
-          <div className="discover-placeholder-icon"><Compass size={31} /></div>
-          <span className="discover-placeholder-eyebrow">AUDIUS</span>
-          <h2>{language === 'en' ? 'Discover new music' : 'Descubrí música nueva'}</h2>
-          <p>
-            {language === 'en'
-              ? 'The Audius catalog connection is the next step. Your local music library and player are ready to use in the meantime.'
-              : 'La conexión con el catálogo de Audius es el próximo paso. Mientras tanto, tu biblioteca local y el reproductor siguen disponibles.'}
-          </p>
-          <button type="button" onClick={() => setActiveSection('local')}>
-            <FolderOpen size={17} />
-            {language === 'en' ? 'Go to my music' : 'Ir a mi música'}
-          </button>
-        </section>
+        <AudiusExplorer language={language} onPlayTrack={playAudiusTrack} />
       )}
 
       {isFullscreen && (
@@ -874,7 +910,7 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
           className={`fullscreen-experience ${showFullscreenControls ? 'controls-visible' : ''} ${showFullscreenLibrary ? 'library-open' : ''}`}
           onPointerMove={revealFullscreenControls}
           onPointerDown={revealFullscreenControls}
-          onPointerLeave={scheduleHideFullscreenControls}
+          onPointerLeave={() => scheduleHideFullscreenControls()}
         >
           <div className="fullscreen-topbar">
             <div className="fullscreen-brand">
@@ -937,7 +973,7 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
 
               <p>
                 {currentSong
-                  ? tr('echoPulsePlaying', 'EchoPulse está reproduciendo', 'EchoPulse is playing')
+                  ? (currentSong.artist || tr('echoPulsePlaying', 'EchoPulse está reproduciendo', 'EchoPulse is playing'))
                   : tr('selectSongInLibrary', 'Seleccioná una canción de tu biblioteca', 'Select a song in your library')}
               </p>
 

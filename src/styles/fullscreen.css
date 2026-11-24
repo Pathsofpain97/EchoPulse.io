@@ -1871,3 +1871,90 @@
   }
 }
 
+
+
+/* =========================================================
+   FULLSCREEN REFINEMENT - OCULTACION Y EXPANSION SUAVE
+   La experiencia visual gana protagonismo cuando los controles
+   desaparecen y recupera su distribucion al mover el puntero.
+========================================================= */
+
+.fullscreen-main {
+  transition:
+    grid-template-columns 0.58s cubic-bezier(0.22, 1, 0.36, 1),
+    gap 0.58s cubic-bezier(0.22, 1, 0.36, 1),
+    padding 0.58s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.fullscreen-now-playing {
+  min-width: 0;
+  overflow: hidden;
+  transition:
+    opacity 0.38s ease,
+    transform 0.58s cubic-bezier(0.22, 1, 0.36, 1),
+    padding 0.58s ease,
+    border-color 0.58s ease;
+}
+
+.fullscreen-visualizer {
+  transition: transform 0.58s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.fullscreen-visualizer > .visualizer-mode-card {
+  max-height: 190px;
+  overflow: hidden;
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    max-height 0.42s ease,
+    opacity 0.32s ease,
+    transform 0.42s ease,
+    padding 0.42s ease,
+    margin 0.42s ease,
+    border-width 0.42s ease;
+}
+
+.fullscreen-experience:not(.controls-visible) .fullscreen-main {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0fr);
+  gap: 0;
+  padding: 18px 0 12px;
+}
+
+.fullscreen-experience:not(.controls-visible) .fullscreen-now-playing {
+  width: 0;
+  min-width: 0;
+  padding-left: 0;
+  padding-right: 0;
+  border-left-color: transparent;
+  opacity: 0;
+  transform: translateX(16px);
+  pointer-events: none;
+}
+
+.fullscreen-experience:not(.controls-visible) .fullscreen-visualizer {
+  transform: scale(1.012);
+}
+
+.fullscreen-experience:not(.controls-visible) .fullscreen-visualizer > .visualizer-mode-card {
+  max-height: 0;
+  margin: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-width: 0;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+}
+
+.fullscreen-experience:not(.controls-visible) .fullscreen-visualizer > .visualizer-stage {
+  flex: 1 1 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fullscreen-main,
+  .fullscreen-now-playing,
+  .fullscreen-visualizer,
+  .fullscreen-visualizer > .visualizer-mode-card {
+    transition-duration: 0.01ms !important;
+  }
+}

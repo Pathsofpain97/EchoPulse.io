@@ -1662,3 +1662,58 @@
 @media (max-width: 600px) {
   .player-brand-logo { width: 46px; height: 46px; }
 }
+
+/* ========================================
+   ECHOPULSE BRAND LOCKUP
+======================================== */
+.player-brand {
+  gap: 10px;
+}
+
+.player-brand-logo {
+  width: 62px;
+  height: 62px;
+  filter: drop-shadow(0 0 10px rgba(53, 231, 242, 0.24));
+}
+
+.player-brand-music {
+  flex: 0 0 auto;
+  color: var(--color-cyan);
+  filter: drop-shadow(0 0 7px rgba(53, 231, 242, 0.35));
+}
+
+.player-brand h1 {
+  margin: 0;
+  font-size: 25px;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .player-brand { gap: 7px; }
+  .player-brand-logo { width: 48px; height: 48px; }
+  .player-brand-music { width: 18px; height: 18px; }
+  .player-brand h1 { font-size: clamp(17px, 4.8vw, 21px); }
+}
+
+@media (max-width: 380px) {
+  .player-brand { gap: 5px; }
+  .player-brand-logo { width: 42px; height: 42px; }
+  .player-brand-music { width: 16px; height: 16px; }
+  .player-brand h1 { font-size: 16px; letter-spacing: 0; }
+}
+
+
+/* Navegación de fuentes: cian para biblioteca local y violeta para Audius */
+.source-navigation .source-nav-local.active {
+  color: #35e7f2;
+  border-color: rgba(53, 231, 242, .25);
+  background: linear-gradient(135deg, rgba(53, 231, 242, .13), rgba(53, 231, 242, .045));
+  box-shadow: 0 0 20px rgba(53, 231, 242, .1), inset 0 0 14px rgba(53, 231, 242, .035);
+}
+.source-navigation .source-nav-discover.active {
+  color: #c5a5ff;
+  border-color: rgba(183, 138, 255, .32);
+  background: linear-gradient(135deg, rgba(153, 92, 255, .18), rgba(153, 92, 255, .055));
+  box-shadow: 0 0 22px rgba(153, 92, 255, .14), inset 0 0 14px rgba(153, 92, 255, .045);
+}
+.source-navigation .source-nav-discover:focus-visible { outline-color: #b78aff; }

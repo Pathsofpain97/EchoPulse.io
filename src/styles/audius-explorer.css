@@ -1,0 +1,66 @@
+/* ========================================
+   ECHOPULSE - AUDIUS DISCOVERY
+======================================== */
+.audius-explorer {
+  --audius-accent: #b78aff;
+  --audius-accent-soft: rgba(153, 92, 255, .14);
+  width: min(100%, 1100px);
+  margin: 0 auto 34px;
+  padding: clamp(19px, 3vw, 30px);
+  color: #f4f4ff;
+  border: 1px solid rgba(183, 138, 255, .24);
+  border-radius: 22px;
+  background: radial-gradient(ellipse at 85% 0%, rgba(153, 92, 255, .12), transparent 44%), linear-gradient(145deg, rgba(20, 17, 43, .94), rgba(11, 15, 32, .96));
+  box-shadow: 0 18px 55px rgba(0, 0, 0, .2), 0 0 30px rgba(153, 92, 255, .055);
+}
+.audius-explorer-heading { text-align: center; }
+.audius-explorer-eyebrow { display: inline-flex; align-items: center; gap: 7px; color: #c5a5ff; font-size: 10px; font-weight: 900; letter-spacing: 2.3px; }
+.audius-explorer-heading h2 { margin: 12px 0 0; color: #f7f5ff; font-size: clamp(23px, 3.5vw, 34px); line-height: 1.15; }
+.audius-explorer-heading p { margin: 10px auto 0; max-width: 550px; color: #a8a4c1; font-size: 13px; line-height: 1.6; }
+.audius-search { display: flex; align-items: center; gap: 11px; width: min(690px, 100%); min-height: 52px; margin: 25px auto 30px; padding: 5px 6px 5px 15px; color: #bca8e8; border: 1px solid rgba(183, 138, 255, .28); border-radius: 14px; background: rgba(8, 10, 25, .72); box-shadow: 0 0 22px rgba(153, 92, 255, .06); }
+.audius-search:focus-within { border-color: rgba(183, 138, 255, .68); box-shadow: 0 0 0 3px rgba(153, 92, 255, .1), 0 0 25px rgba(153, 92, 255, .1); }
+.audius-search input { flex: 1; min-width: 0; color: #f4f4ff; border: 0; outline: 0; background: transparent; font: inherit; font-size: 13px; }
+.audius-search input::placeholder { color: #77728f; }
+.audius-search button, .audius-state button { min-height: 39px; padding: 0 17px; color: #fff; border: 1px solid rgba(183, 138, 255, .4); border-radius: 10px; background: linear-gradient(135deg, #8951dc, #6337ad); font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; transition: .2s ease; }
+.audius-search button:hover, .audius-state button:hover { filter: brightness(1.13); box-shadow: 0 0 20px rgba(153, 92, 255, .22); }
+.audius-results-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 15px; }
+.audius-results-heading > div { display: flex; align-items: center; gap: 10px; }
+.audius-section-icon { display: grid; width: 33px; height: 33px; place-items: center; color: #c5a5ff; border: 1px solid rgba(183, 138, 255, .25); border-radius: 10px; background: rgba(153, 92, 255, .1); }
+.audius-results-heading h3 { margin: 0; color: #eeeaff; font-size: 15px; }
+.audius-results-count { color: #a99acb; font-size: 11px; font-variant-numeric: tabular-nums; }
+.audius-track-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.audius-track-card { position: relative; display: grid; grid-template-columns: 62px minmax(0, 1fr) 34px; align-items: center; gap: 11px; min-width: 0; padding: 10px; border: 1px solid rgba(174, 155, 214, .12); border-radius: 14px; background: rgba(8, 11, 27, .57); transition: border-color .2s ease, background .2s ease, transform .2s ease; }
+.audius-track-card:hover { transform: translateY(-2px); border-color: rgba(183, 138, 255, .34); background: rgba(33, 23, 58, .66); }
+.audius-track-art { position: relative; display: grid; width: 62px; height: 62px; overflow: hidden; place-items: center; padding: 0; border: 0; border-radius: 10px; background: linear-gradient(135deg, rgba(153, 92, 255, .25), rgba(53, 231, 242, .1)); cursor: pointer; }
+.audius-track-art img { width: 100%; height: 100%; object-fit: cover; }
+.audius-art-fallback { color: #c5a5ff; }
+.audius-art-play { position: absolute; inset: 0; display: grid; place-items: center; color: #fff; opacity: 0; background: rgba(14, 8, 29, .58); transition: opacity .2s ease; }
+.audius-track-art:hover .audius-art-play, .audius-track-art:focus-visible .audius-art-play { opacity: 1; }
+.audius-track-meta { display: flex; min-width: 0; flex-direction: column; gap: 5px; }
+.audius-track-meta strong, .audius-track-meta span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.audius-track-meta strong { color: #f1edff; font-size: 12px; font-weight: 750; }
+.audius-track-meta span { color: #9e98b6; font-size: 11px; }
+.audius-track-play { display: grid; width: 32px; height: 32px; place-items: center; color: #d6c3ff; border: 1px solid rgba(183, 138, 255, .25); border-radius: 50%; background: rgba(153, 92, 255, .12); cursor: pointer; transition: .2s ease; }
+.audius-track-play:hover { color: #fff; border-color: rgba(183, 138, 255, .6); background: rgba(153, 92, 255, .28); }
+.audius-track-index { position: absolute; top: 5px; right: 7px; color: rgba(194, 177, 225, .3); font-size: 8px; font-weight: 800; pointer-events: none; }
+.audius-state { display: flex; min-height: 150px; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: #a9a1c2; text-align: center; font-size: 13px; }
+.audius-state p { max-width: 430px; margin: 0; line-height: 1.6; }
+.audius-error { color: #c0a7d8; }
+.audius-spinner { color: #c5a5ff; animation: audius-spin 1s linear infinite; }
+.audius-explorer-footer { margin-top: 22px; color: #77708f; font-size: 10px; text-align: center; }
+.audius-explorer-footer a { color: #c5a5ff; text-decoration: none; }
+.audius-explorer-footer a:hover { text-decoration: underline; }
+@keyframes audius-spin { to { transform: rotate(360deg); } }
+@media (max-width: 900px) { .audius-track-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) {
+  .audius-explorer { padding: 17px 13px; border-radius: 17px; }
+  .audius-explorer-heading p { font-size: 12px; }
+  .audius-search { min-height: 48px; margin: 19px auto 23px; gap: 8px; padding-left: 11px; }
+  .audius-search input { font-size: 12px; }
+  .audius-search button { min-height: 36px; padding: 0 11px; font-size: 11px; }
+  .audius-track-grid { grid-template-columns: 1fr; gap: 8px; }
+  .audius-track-card { grid-template-columns: 54px minmax(0, 1fr) 32px; padding: 8px; }
+  .audius-track-art { width: 54px; height: 54px; }
+  .audius-track-meta strong { font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .audius-track-card, .audius-track-art, .audius-art-play, .audius-track-play { transition: none; } .audius-spinner { animation-duration: 3s; } }

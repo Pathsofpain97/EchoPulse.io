@@ -169,3 +169,51 @@
   .source-selection-content h1 { font-size: 27px; }
   .source-option { padding: 15px 16px; }
 }
+
+/* Marca oficial compartida con el encabezado del reproductor */
+.source-selection-brand {
+  gap: 9px;
+}
+.source-selection-logo {
+  display: block;
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 9px rgba(53, 231, 242, .22));
+}
+.source-selection-brand-music {
+  flex: 0 0 auto;
+  color: var(--source-cyan);
+  filter: drop-shadow(0 0 6px rgba(53, 231, 242, .3));
+}
+@media (max-width: 600px) {
+  .source-selection-logo { width: 43px; height: 43px; }
+  .source-selection-brand-music { width: 18px; height: 18px; }
+  .source-selection-brand { gap: 6px; font-size: 18px; }
+}
+
+
+/* Identidad cromática permanente de cada fuente */
+.source-option-local {
+  --option-accent: #35e7f2;
+  --option-glow: rgba(53, 231, 242, .2);
+}
+.source-option-discover {
+  --option-accent: #b78aff;
+  --option-glow: rgba(153, 92, 255, .25);
+  border-color: rgba(153, 92, 255, .23);
+  background: radial-gradient(ellipse at 100% 0%, rgba(153, 92, 255, .13), transparent 58%), linear-gradient(145deg, rgba(31, 25, 58, .9), rgba(13, 18, 38, .96));
+}
+.source-option-local:hover {
+  border-color: rgba(53, 231, 242, .62);
+  box-shadow: 0 22px 55px rgba(0, 0, 0, .3), 0 0 34px rgba(53, 231, 242, .13);
+}
+.source-option-discover:hover {
+  border-color: rgba(183, 138, 255, .72);
+  box-shadow: 0 22px 55px rgba(0, 0, 0, .3), 0 0 38px rgba(153, 92, 255, .2);
+}
+.source-option-discover:focus-visible { outline-color: #b78aff; }
+.source-option-local .source-option-icon { box-shadow: 0 0 22px rgba(53, 231, 242, .08); }
+.source-option-discover .source-option-icon { box-shadow: 0 0 24px rgba(153, 92, 255, .12); }
+.source-option-discover .source-option-action { color: #c5a5ff; }
+.source-selection-glow-two { background: #995cff; opacity: .2; }

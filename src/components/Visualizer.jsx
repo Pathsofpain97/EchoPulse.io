@@ -798,87 +798,130 @@ function drawAurora(ctx, width, height, colors, energy, elapsed, strands) {
 }
 
 function drawSmokeFlow(ctx, width, height, data, elapsed, getAverage, colors) {
-  // A single dense chimney-like plume: broad translucent layers, very few
-  // canvas operations per frame to keep tablets and phones responsive.
-  const time = elapsed * 0.00022;
+  // Volumetric chimney-like smoke: a broad, continuous cloud with soft edges.
+  // The number of paths is deliberately small to keep 30 FPS performance on tablets.
+  const time = elapsed * 0.00016;
   const bass = getAverage(data, 1, Math.max(2, Math.floor(data.length * 0.12)));
-  const energy = 0.88 + bass * 0.22;
-  const cx = width * 0.5;
-  const baseY = height * 1.08;
-  const plumeHeight = height * 0.98;
-  const sway = Math.sin(time * 0.72) * width * 0.045;
-  const color = colors.mid || '#35e7f2';
+  const mid = getAverage(data, Math.floor(data.length * 0.12), Math.floor(data.length * 0.42));
+  const pulse = 1 + bass * 0.12;
+  const center = width * 0.5;
+  const bottom = height * 1.12;
+  const top = height * 0.04;
+  const plumeHeight = bottom - top;
+  const sway = Math.sin(time * 0.72) * width * 0.055 + Math.sin(time * 0.31) * width * 0.025;
+  const hueA = colors.low || '#35e7f2';
+  const hueB = colors.mid || '#995cff';
+  const hueC = colors.high || '#ed35d1';
+  const hueD = colors.magenta || '#35e7f2';
 
   ctx.save();
   ctx.globalCompositeOperation = 'screen';
-  ctx.lineCap = 'round';
   ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
 
-  // Broad central body. The overlapping translucent strokes create a
-  // continuous, soft-edged column rather than separate bubbles or rings.
-  const layers = [
-    { offset: -0.10, width: 0.20, alpha: 0.055, phase: 0.0 },
-    { offset: 0.04, width: 0.16, alpha: 0.075, phase: 1.1 },
-    { offset: 0.16, width: 0.115, alpha: 0.085, phase: 2.0 },
-    { offset: -0.19, width: 0.095, alpha: 0.065, phase: 2.8 },
-    { offset: 0.27, width: 0.065, alpha: 0.055, phase: 3.7 }
+  // Main continuous smoke body. The changing silhouette makes it billow instead
+  // of looking like a thin glowing strand.
+  const drift1 = Math.sin(time * 0.9) * width * 0.075;
+  const drift2 = Math.sin(time * 0.57 + 1.8) * width * 0.09;
+  const drift3 = Math.cos(time * 0.43 + 0.7) * width * 0.065;
+  const body = new Path2D();
+  body.moveTo(center - width * 0.16, bottom);
+  body.bezierCurveTo(
+    center - width * 0.23 + sway, bottom - plumeHeight * 0.20,
+    center - width * 0.19 + drift1, bottom - plumeHeight * 0.34,
+    center - width * 0.12 + drift1, bottom - plumeHeight * 0.48
+  );
+  body.bezierCurveTo(
+    center - width * 0.02 + drift2, bottom - plumeHeight * 0.63,
+    center + width * 0.15 + drift2, bottom - plumeHeight * 0.66,
+    center + width * 0.12 + drift3, bottom - plumeHeight * 0.79
+  );
+  body.bezierCurveTo(
+    center + width * 0.10 + drift3, bottom - plumeHeight * 0.91,
+    center - width * 0.04 + drift1, bottom - plumeHeight * 0.96,
+    center + sway * 0.45, top
+  );
+  body.bezierCurveTo(
+    center + width * 0.20 + drift3, top + plumeHeight * 0.08,
+    center + width * 0.28 + drift2, top + plumeHeight * 0.22,
+    center + width * 0.19 + drift2, top + plumeHeight * 0.34
+  );
+  body.bezierCurveTo(
+    center + width * 0.11 + drift1, top + plumeHeight * 0.48,
+    center - width * 0.02 + drift1, top + plumeHeight * 0.55,
+    center - width * 0.10 + drift2, top + plumeHeight * 0.69
+  );
+  body.bezierCurveTo(
+    center - width * 0.18 + sway, top + plumeHeight * 0.82,
+    center - width * 0.04, bottom - plumeHeight * 0.10,
+    center - width * 0.16, bottom
+  );
+  body.closePath();
+
+  const smokeBase = ctx.createLinearGradient(center - width * 0.25, 0, center + width * 0.25, 0);
+  smokeBase.addColorStop(0, 'rgba(150,160,174,0.10)');
+  smokeBase.addColorStop(0.22, 'rgba(205,211,220,0.27)');
+  smokeBase.addColorStop(0.48, 'rgba(245,247,250,0.43)');
+  smokeBase.addColorStop(0.72, 'rgba(205,213,224,0.30)');
+  smokeBase.addColorStop(1, 'rgba(125,140,158,0.08)');
+  ctx.fillStyle = smokeBase;
+  ctx.globalAlpha = 0.88;
+  ctx.fill(body);
+
+  // Broad color wash over the entire smoke volume, not just its centerline.
+  ctx.save();
+  ctx.clip(body);
+  const colorWash = ctx.createLinearGradient(
+    center - width * 0.22 + drift1, top,
+    center + width * 0.22 + drift2, bottom
+  );
+  colorWash.addColorStop(0, hueA);
+  colorWash.addColorStop(0.34, hueB);
+  colorWash.addColorStop(0.68, hueC);
+  colorWash.addColorStop(1, hueD);
+  ctx.globalAlpha = 0.24 + mid * 0.10;
+  ctx.fillStyle = colorWash;
+  ctx.fillRect(center - width * 0.32, top, width * 0.64, plumeHeight);
+
+  // Soft internal billows add volume without expensive blur filters.
+  const billows = [
+    { x: -0.075, y: 0.25, w: 0.22, h: 0.19, phase: 0.2 },
+    { x: 0.065, y: 0.48, w: 0.25, h: 0.20, phase: 1.7 },
+    { x: -0.045, y: 0.70, w: 0.23, h: 0.18, phase: 2.8 }
   ];
-
-  layers.forEach((layer, index) => {
-    const drift = Math.sin(time + layer.phase) * width * 0.035;
-    const drift2 = Math.sin(time * 0.63 + layer.phase + 1.7) * width * 0.025;
-    const x0 = cx + sway * 0.25 + layer.offset * width * 0.12;
-    const x1 = cx + drift - layer.offset * width * 0.06;
-    const x2 = cx + drift2 + layer.offset * width * 0.08;
-    const x3 = cx + sway + Math.sin(time * 0.48 + layer.phase) * width * 0.055;
-    const lineWidth = Math.max(12, width * layer.width * energy);
-
-    const gradient = ctx.createLinearGradient(x0 - lineWidth, 0, x0 + lineWidth, 0);
-    gradient.addColorStop(0, 'rgba(175,185,198,0)');
-    gradient.addColorStop(0.28, `rgba(205,213,222,${layer.alpha * 0.7})`);
-    gradient.addColorStop(0.52, `rgba(245,247,250,${layer.alpha * 1.25})`);
-    gradient.addColorStop(0.76, `rgba(175,190,207,${layer.alpha * 0.65})`);
-    gradient.addColorStop(1, 'rgba(150,165,180,0)');
-
+  billows.forEach((b) => {
+    const bx = center + b.x * width + Math.sin(time * 0.8 + b.phase) * width * 0.045;
+    const by = top + plumeHeight * b.y + Math.cos(time * 0.6 + b.phase) * height * 0.025;
+    const rx = width * b.w * (1 + bass * 0.08);
+    const ry = plumeHeight * b.h;
+    const grad = ctx.createRadialGradient(bx, by, 1, bx, by, rx);
+    grad.addColorStop(0, 'rgba(245,248,255,0.24)');
+    grad.addColorStop(0.42, 'rgba(210,220,235,0.12)');
+    grad.addColorStop(1, 'rgba(160,175,195,0)');
+    ctx.globalAlpha = 0.72;
+    ctx.fillStyle = grad;
     ctx.beginPath();
-    ctx.moveTo(x0, baseY);
-    ctx.bezierCurveTo(
-      x0 - drift * 0.3, baseY - plumeHeight * 0.28,
-      x1 + Math.sin(time * 0.8 + layer.phase) * width * 0.06, baseY - plumeHeight * 0.43,
-      x1, baseY - plumeHeight * 0.56
-    );
-    ctx.bezierCurveTo(
-      x1 - Math.sin(time * 0.7 + layer.phase) * width * 0.08, baseY - plumeHeight * 0.72,
-      x2 + Math.cos(time * 0.55 + layer.phase) * width * 0.08, baseY - plumeHeight * 0.78,
-      x3, baseY - plumeHeight * (0.9 + 0.025 * Math.sin(time + layer.phase))
-    );
-    ctx.strokeStyle = gradient;
-    ctx.globalAlpha = 1;
-    ctx.lineWidth = lineWidth;
-    ctx.stroke();
+    ctx.ellipse(bx, by, rx, ry, Math.sin(time + b.phase) * 0.16, 0, Math.PI * 2);
+    ctx.fill();
   });
+  ctx.restore();
 
-  // Soft pale core and subtle moving color reflection. No blur filters,
-  // particle clouds, per-particle gradients or expensive shadow effects.
-  const coreX = cx + sway * 0.72;
-  const coreGradient = ctx.createLinearGradient(coreX - width * 0.045, 0, coreX + width * 0.045, 0);
-  coreGradient.addColorStop(0, 'rgba(230,236,244,0)');
-  coreGradient.addColorStop(0.5, `rgba(238,242,248,${0.12 + bass * 0.035})`);
-  coreGradient.addColorStop(1, 'rgba(220,230,240,0)');
-  ctx.beginPath();
-  ctx.moveTo(coreX, baseY);
-  ctx.bezierCurveTo(coreX - sway, baseY - plumeHeight * 0.35, coreX + sway * 0.6, baseY - plumeHeight * 0.62, coreX + sway * 0.35, baseY - plumeHeight * 0.98);
-  ctx.strokeStyle = coreGradient;
-  ctx.lineWidth = Math.max(5, width * 0.075);
-  ctx.stroke();
-
-  ctx.globalAlpha = 0.10 + bass * 0.045;
-  ctx.strokeStyle = color;
-  ctx.lineWidth = Math.max(2, width * 0.012);
-  ctx.beginPath();
-  ctx.moveTo(cx - sway * 0.15, baseY - plumeHeight * 0.12);
-  ctx.bezierCurveTo(cx + sway, baseY - plumeHeight * 0.42, cx - sway * 0.5, baseY - plumeHeight * 0.65, cx + sway * 0.7, baseY - plumeHeight * 0.88);
-  ctx.stroke();
+  // A few wide, faint wisps break up the edge and make the plume feel alive.
+  ctx.globalAlpha = 0.20 + bass * 0.06;
+  ctx.strokeStyle = 'rgba(238,243,250,0.65)';
+  ctx.lineWidth = Math.max(8, width * 0.035 * pulse);
+  for (let i = 0; i < 3; i += 1) {
+    const phase = time * (0.65 + i * 0.08) + i * 2.1;
+    const y = top + plumeHeight * (0.25 + i * 0.23);
+    ctx.beginPath();
+    ctx.moveTo(center - width * 0.13 + Math.sin(phase) * width * 0.05, y + height * 0.10);
+    ctx.bezierCurveTo(
+      center - width * 0.22 + Math.cos(phase) * width * 0.08, y,
+      center + width * 0.17 + Math.sin(phase + 1.4) * width * 0.08, y - height * 0.06,
+      center + width * 0.12 + Math.cos(phase + 0.8) * width * 0.06, y - height * 0.13
+    );
+    ctx.stroke();
+  }
 
   ctx.restore();
 }

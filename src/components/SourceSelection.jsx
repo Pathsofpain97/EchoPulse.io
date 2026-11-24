@@ -1,4 +1,5 @@
 import { Compass, FolderOpen, Music2 } from 'lucide-react';
+import echoPulseLogo from '../assets/EchoPulse.png';
 import '../styles/source-selection.css';
 
 function SourceSelection({ language = 'es', onLanguageChange = () => {}, onSelect = () => {} }) {
@@ -11,7 +12,8 @@ function SourceSelection({ language = 'es', onLanguageChange = () => {}, onSelec
 
       <header className="source-selection-header">
         <div className="source-selection-brand">
-          <span className="source-selection-brand-icon"><Music2 size={25} /></span>
+          <img className="source-selection-logo" src={echoPulseLogo} alt="" aria-hidden="true" />
+          <Music2 className="source-selection-brand-music" size={21} aria-hidden="true" />
           <span>EchoPulse</span>
         </div>
 
