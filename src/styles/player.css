@@ -395,17 +395,14 @@
   padding: 11px 17px;
   border-radius: 9px;
 
-  background: linear-gradient(
-    110deg,
-    #6848e8,
-    #8249dc
-  );
+  background: linear-gradient(110deg, #087f91, #12b9c8);
+  border: 1px solid rgba(53, 231, 242, .55);
 
   color: white;
   font-size: 13px;
   cursor: pointer;
 
-  box-shadow: 0 4px 16px rgba(112, 72, 232, 0.18);
+  box-shadow: 0 4px 16px rgba(53, 231, 242, 0.18);
 
   transition:
     transform var(--transition-fast),
@@ -418,8 +415,8 @@
   filter: brightness(1.12);
 
   box-shadow:
-    0 6px 20px rgba(112, 72, 232, 0.3),
-    0 0 12px rgba(53, 231, 242, 0.08);
+    0 6px 20px rgba(53, 231, 242, 0.28),
+    0 0 16px rgba(53, 231, 242, 0.2);
 }
 
 .add-music-button input {
@@ -1545,6 +1542,15 @@
 /* ========================================
    ECHOPULSE - SOURCE NAVIGATION
 ======================================== */
+.source-navigation-guidance {
+  margin: -13px 0 9px;
+  color: #aeb8d4;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .25px;
+  text-align: center;
+}
+
 .source-navigation {
   display: flex;
   justify-content: center;

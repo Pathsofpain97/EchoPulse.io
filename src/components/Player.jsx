@@ -34,6 +34,11 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
   const shouldAutoPlayRef = useRef(false);
   const playerLayoutRef = useRef(null);
   const controlsTimeoutRef = useRef(null);
+  // Conserva la energía y los colores efectivos entre el visualizador normal y fullscreen.
+  const visualizerColorStateRef = useRef({
+    energy: { low: 0, mid: 0, high: 0 },
+    colors: null
+  });
 
   const audioContextRef = useRef(null);
   const analyserRef = useRef(null);
@@ -51,6 +56,8 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
 
   const [equalizerValues, setEqualizerValues] = useState([0, 0, 0, 0, 0]);
   const [equalizerPreset, setEqualizerPreset] = useState('Normal');
+  // Reloj compartido por los dos visualizadores: cambiar de vista no reinicia la transición cromática.
+  const [colorTransitionStart, setColorTransitionStart] = useState(() => performance.now());
   const [visualizerMode, setVisualizerMode] = useState('classic');
 
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -64,6 +71,16 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
   const [libraryNotice, setLibraryNotice] = useState(null);
 
   songsRef.current = songs;
+
+  useEffect(() => {
+    // Un cambio real de perfil inicia una transición nueva desde el cian.
+    // Cambiar entre vista normal y fullscreen no modifica este estado.
+    visualizerColorStateRef.current = {
+      energy: { low: 0, mid: 0, high: 0 },
+      colors: null
+    };
+    setColorTransitionStart(performance.now());
+  }, [equalizerPreset]);
 
   const tr = (key, spanish, english) => {
     const translated = t(language, key);
@@ -727,7 +744,11 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
       </header>
 
       {!isFullscreen && (
-        <nav className="source-navigation" aria-label={language === 'en' ? 'Music sections' : 'Secciones de música'}>
+        <>
+          <div className="source-navigation-guidance">
+            {language === 'en' ? 'Click here to switch between music modes' : 'Hacé clic aquí para cambiar de modo'}
+          </div>
+          <nav className="source-navigation" aria-label={language === 'en' ? 'Music sections' : 'Secciones de música'}>
           <button
             type="button"
             className={`source-nav-local ${activeSection === 'local' ? 'active' : ''}`}
@@ -746,7 +767,8 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
             <Compass size={17} />
             {language === 'en' ? 'Discover music' : 'Descubrir música'}
           </button>
-        </nav>
+          </nav>
+        </>
       )}
 
       <section className="music-player">
@@ -756,6 +778,8 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
               <Visualizer
                 analyser={analyser}
                 preset={equalizerPreset}
+                colorTransitionStart={colorTransitionStart}
+                colorStateRef={visualizerColorStateRef}
                 equalizerValues={equalizerValues}
                 mode={visualizerMode}
                 onModeChange={setVisualizerMode}
@@ -948,6 +972,8 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
               <Visualizer
                 analyser={analyser}
                 preset={equalizerPreset}
+                colorTransitionStart={colorTransitionStart}
+                colorStateRef={visualizerColorStateRef}
                 equalizerValues={equalizerValues}
                 mode={visualizerMode}
                 onModeChange={setVisualizerMode}

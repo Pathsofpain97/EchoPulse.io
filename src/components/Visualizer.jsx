@@ -131,6 +131,8 @@ function mixColors(colorA, colorB, amount) {
 function Visualizer({
   analyser,
   preset = 'Normal',
+  colorTransitionStart = 0,
+  colorStateRef,
   equalizerValues = [0, 0, 0, 0, 0],
   mode: controlledMode,
   onModeChange,
@@ -196,10 +198,14 @@ function Visualizer({
 
     const waveformSmoothData = new Float32Array(timeData.length).fill(128);
 
+    // La energía suavizada también se comparte: al montar el otro visualizador
+    // no vuelve a calcular los colores desde un estado inicial.
+    const savedColorState = colorStateRef?.current;
+    let useSavedColorsForFirstFrame = Boolean(savedColorState?.colors);
     const energy = {
-      low: 0,
-      mid: 0,
-      high: 0
+      low: savedColorState?.energy?.low ?? 0,
+      mid: savedColorState?.energy?.mid ?? 0,
+      high: savedColorState?.energy?.high ?? 0
     };
 
     const particles = Array.from({ length: 3200 }, () => {
@@ -326,10 +332,10 @@ function Visualizer({
         accentTarget = mixColors(palette.accent, palette.low, clamp(cycle * 0.3 + energy.low * 0.22, 0, 0.58));
 
         return {
-          low: lowTarget,
-          mid: midTarget,
-          high: highTarget,
-          magenta: accentTarget
+          low: mixColors(BASE_CYAN, lowTarget, colorProgress),
+          mid: mixColors(BASE_CYAN, midTarget, colorProgress),
+          high: mixColors(BASE_CYAN, highTarget, colorProgress),
+          magenta: mixColors(BASE_CYAN, accentTarget, colorProgress)
         };
       }
 
@@ -394,7 +400,23 @@ function Visualizer({
         timeData.fill(128);
       }
 
-      const colors = getDynamicColors(frequencyData, elapsed);
+      const colorElapsed = colorTransitionStart
+        ? Math.max(0, timestamp - colorTransitionStart)
+        : elapsed;
+      const calculatedColors = getDynamicColors(frequencyData, colorElapsed);
+      const colors = useSavedColorsForFirstFrame
+        ? savedColorState.colors
+        : calculatedColors;
+      useSavedColorsForFirstFrame = false;
+
+      // Guardamos el estado cromático efectivo para que la otra vista lo herede
+      // exactamente, sin volver al cian al entrar o salir de pantalla completa.
+      if (colorStateRef) {
+        colorStateRef.current = {
+          energy: { ...energy },
+          colors
+        };
+      }
 
       switch (mode) {
         case 'classic':
@@ -441,7 +463,7 @@ function Visualizer({
     animationId = requestAnimationFrame(draw);
 
     return () => cancelAnimationFrame(animationId);
-  }, [analyser, mode, preset]);
+  }, [analyser, mode, preset, colorTransitionStart, colorStateRef]);
 
   return (
     <div className="visualizer-stage">

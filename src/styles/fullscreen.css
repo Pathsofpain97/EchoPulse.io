@@ -1077,15 +1077,15 @@
   padding: 11px;
 
   color: #fff;
-  background: linear-gradient(110deg, #6848e8, #8249dc);
+  background: linear-gradient(110deg, #087f91, #12b9c8);
 
-  border: none;
+  border: 1px solid rgba(53, 231, 242, .55);
   border-radius: 9px;
 
   font-size: 12px;
   cursor: pointer;
 
-  box-shadow: 0 4px 16px rgba(112, 72, 232, 0.18);
+  box-shadow: 0 4px 16px rgba(53, 231, 242, 0.18);
 
   transition:
     transform 0.2s ease,
@@ -1096,7 +1096,7 @@
 .fullscreen-add-music:hover {
   transform: translateY(-1px);
   filter: brightness(1.12);
-  box-shadow: 0 6px 20px rgba(112, 72, 232, 0.3);
+  box-shadow: 0 6px 20px rgba(53, 231, 242, 0.28), 0 0 16px rgba(53, 231, 242, 0.2);
 }
 
 .fullscreen-library-search {

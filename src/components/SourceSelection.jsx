@@ -33,6 +33,10 @@ function SourceSelection({ language = 'es', onLanguageChange = () => {}, onSelec
             : 'Elegí de dónde viene tu música. Podés cambiar de opción cuando quieras.'}
         </p>
 
+        <p className="source-selection-mode-hint">
+          {isEnglish ? 'Click a card below to choose or switch your music mode.' : 'Hacé clic en una de estas opciones para elegir o cambiar de modo.'}
+        </p>
+
         <div className="source-selection-options">
           <button type="button" className="source-option source-option-discover" onClick={() => onSelect('discover')}>
             <span className="source-option-icon"><Compass size={32} /></span>
@@ -54,6 +58,11 @@ function SourceSelection({ language = 'es', onLanguageChange = () => {}, onSelec
         </div>
 
         <p className="source-selection-footnote">
+          {isEnglish
+            ? 'Your music options are also available at the bottom of the player: discover tracks on Audius or add your own MP3 files.'
+            : 'Dentro del reproductor también vas a encontrar estas opciones abajo: podés descubrir canciones en Audius o agregar tus propios archivos MP3.'}
+        </p>
+        <p className="source-selection-footnote source-selection-account-note">
           {isEnglish ? 'No account is needed to use your local music.' : 'No necesitás una cuenta para escuchar tu música local.'}
         </p>
       </section>
