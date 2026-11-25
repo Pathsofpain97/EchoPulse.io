@@ -20,6 +20,7 @@ import {
 import Visualizer, { VisualizerModeSelector } from './Visualizer';
 import Equalizer from './Equalizer';
 import AudiusExplorer from './AudiusExplorer';
+import TrackArtwork from './TrackArtwork';
 import { t } from './i18n/translations';
 import echoPulseLogo from '../assets/EchoPulse.png';
 
@@ -28,12 +29,107 @@ import '../styles/fullscreen.css';
 import '../styles/mobile-refinement.css';
 import '../styles/control-cards.css';
 
+function readSynchsafeSize(bytes, offset) {
+  return ((bytes[offset] & 0x7f) << 21) |
+    ((bytes[offset + 1] & 0x7f) << 14) |
+    ((bytes[offset + 2] & 0x7f) << 7) |
+    (bytes[offset + 3] & 0x7f);
+}
+
+function findTextTerminator(bytes, start, encoding) {
+  if (encoding === 1 || encoding === 2) {
+    for (let index = start; index < bytes.length - 1; index += 2) {
+      if (bytes[index] === 0 && bytes[index + 1] === 0) return index + 2;
+    }
+    return bytes.length;
+  }
+
+  const end = bytes.indexOf(0, start);
+  return end === -1 ? bytes.length : end + 1;
+}
+
+async function extractMp3Artwork(file) {
+  if (!/\.mp3$/i.test(file.name) || file.size < 20) return null;
+
+  try {
+    // Las etiquetas ID3 están al comienzo del MP3. Limitamos la lectura para
+    // evitar cargar innecesariamente archivos de audio completos en memoria.
+    const buffer = await file.slice(0, Math.min(file.size, 16 * 1024 * 1024)).arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    if (String.fromCharCode(...bytes.slice(0, 3)) !== 'ID3') return null;
+
+    const version = bytes[3];
+    if (version < 2 || version > 4) return null;
+
+    const tagEnd = Math.min(10 + readSynchsafeSize(bytes, 6), bytes.length);
+    let offset = 10;
+
+    // Algunas etiquetas incluyen una cabecera extendida antes de los frames.
+    if (version >= 3 && (bytes[5] & 0x40)) {
+      const extendedSize = version === 4
+        ? readSynchsafeSize(bytes, offset)
+        : ((bytes[offset] << 24) | (bytes[offset + 1] << 16) | (bytes[offset + 2] << 8) | bytes[offset + 3]) >>> 0;
+      offset += version === 4 ? extendedSize : extendedSize + 4;
+    }
+
+    while (offset < tagEnd - (version === 2 ? 6 : 10)) {
+      const headerSize = version === 2 ? 6 : 10;
+      const frameId = String.fromCharCode(...bytes.slice(offset, offset + (version === 2 ? 3 : 4)));
+      if (!frameId.trim() || /^\0+$/.test(frameId)) break;
+
+      const frameSize = version === 2
+        ? (bytes[offset + 3] << 16) | (bytes[offset + 4] << 8) | bytes[offset + 5]
+        : version === 4
+          ? readSynchsafeSize(bytes, offset + 4)
+          : ((bytes[offset + 4] << 24) | (bytes[offset + 5] << 16) | (bytes[offset + 6] << 8) | bytes[offset + 7]) >>> 0;
+
+      const dataStart = offset + headerSize;
+      const frameEnd = Math.min(dataStart + frameSize, tagEnd);
+      if (frameSize <= 0 || frameEnd <= dataStart) break;
+
+      if ((frameId === 'APIC' || frameId === 'PIC') && frameEnd - dataStart > 8) {
+        const encoding = bytes[dataStart];
+        let cursor = dataStart + 1;
+        let mime = 'image/jpeg';
+
+        if (frameId === 'PIC') {
+          const imageFormat = String.fromCharCode(...bytes.slice(cursor, cursor + 3)).toUpperCase();
+          mime = imageFormat === 'PNG' ? 'image/png' : 'image/jpeg';
+          cursor += 3;
+        } else {
+          const mimeEnd = bytes.indexOf(0, cursor);
+          if (mimeEnd === -1 || mimeEnd >= frameEnd) break;
+          const declaredMime = new TextDecoder().decode(bytes.slice(cursor, mimeEnd));
+          if (declaredMime.startsWith('image/')) mime = declaredMime;
+          cursor = mimeEnd + 1;
+        }
+
+        // Tipo de imagen, seguido por la descripción terminada en cero.
+        cursor += 1;
+        cursor = findTextTerminator(bytes.subarray(0, frameEnd), cursor, encoding);
+
+        if (cursor < frameEnd) {
+          const imageBlob = new Blob([bytes.slice(cursor, frameEnd)], { type: mime });
+          if (imageBlob.size > 0) return URL.createObjectURL(imageBlob);
+        }
+      }
+
+      offset = frameEnd;
+    }
+  } catch (error) {
+    console.warn('No se pudo leer la portada ID3 del archivo:', file.name, error);
+  }
+
+  return null;
+}
+
 function Player({ language = 'es', onLanguageChange = () => {}, initialSection = 'local' }) {
   const audioRef = useRef(null);
   const fileInputRef = useRef(null);
   const shouldAutoPlayRef = useRef(false);
   const playerLayoutRef = useRef(null);
   const controlsTimeoutRef = useRef(null);
+  const dragCounterRef = useRef(0);
   // Conserva la energía y los colores efectivos entre el visualizador normal y fullscreen.
   const visualizerColorStateRef = useRef({
     energy: { low: 0, mid: 0, high: 0 },
@@ -69,6 +165,7 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
   const [audiusQueue, setAudiusQueue] = useState([]);
   const [audiusIndex, setAudiusIndex] = useState(0);
   const [libraryNotice, setLibraryNotice] = useState(null);
+  const [isDraggingFiles, setIsDraggingFiles] = useState(false);
 
   songsRef.current = songs;
 
@@ -175,9 +272,8 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
     file.lastModified
   ]);
 
-  const handleFiles = (event) => {
-    const files = Array.from(event.target.files || []);
-
+  const addAudioFiles = async (fileList) => {
+    const files = Array.from(fileList || []);
     const audioFiles = files.filter(file =>
       file.type.startsWith('audio/') ||
       /\.(mp3|wav|ogg|m4a|aac|flac)$/i.test(file.name)
@@ -185,48 +281,40 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
 
     if (audioFiles.length === 0) {
       setLibraryNotice({ type: 'info', key: 'noCompatibleAudio' });
-      event.target.value = '';
       return;
     }
 
     const existingSongs = songsRef.current;
-
     const existingIdentifiers = new Set(
       existingSongs.map(song => getFileIdentifier(song.file))
     );
-
     const newIdentifiers = new Set();
     const newSongs = [];
     let duplicateCount = 0;
 
-    audioFiles.forEach(file => {
+    for (const file of audioFiles) {
       const identifier = getFileIdentifier(file);
-
-      if (
-        existingIdentifiers.has(identifier) ||
-        newIdentifiers.has(identifier)
-      ) {
+      if (existingIdentifiers.has(identifier) || newIdentifiers.has(identifier)) {
         duplicateCount++;
-        return;
+        continue;
       }
 
       newIdentifiers.add(identifier);
-
+      const artwork = await extractMp3Artwork(file);
       newSongs.push({
         id: crypto.randomUUID(),
         name: file.name.replace(/\.[^/.]+$/, ''),
         file,
-        url: URL.createObjectURL(file)
+        url: URL.createObjectURL(file),
+        artwork
       });
-    });
+    }
 
     if (newSongs.length > 0) {
       const context = initializeAudioGraph();
-
       if (context?.state === 'suspended') context.resume();
 
       const libraryWasEmpty = existingSongs.length === 0;
-
       setSongs(previousSongs => [...previousSongs, ...newSongs]);
 
       if (libraryWasEmpty) {
@@ -236,27 +324,48 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
     }
 
     if (newSongs.length > 0 && duplicateCount > 0) {
-      setLibraryNotice({
-        type: 'success',
-        key: 'addedWithDuplicates',
-        added: newSongs.length,
-        duplicates: duplicateCount
-      });
+      setLibraryNotice({ type: 'success', key: 'addedWithDuplicates', added: newSongs.length, duplicates: duplicateCount });
     } else if (newSongs.length > 0) {
-      setLibraryNotice({
-        type: 'success',
-        key: 'addedSuccessfully',
-        added: newSongs.length
-      });
+      setLibraryNotice({ type: 'success', key: 'addedSuccessfully', added: newSongs.length });
     } else {
-      setLibraryNotice({
-        type: 'info',
-        key: 'alreadyInLibrary',
-        duplicates: duplicateCount
-      });
+      setLibraryNotice({ type: 'info', key: 'alreadyInLibrary', duplicates: duplicateCount });
     }
+  };
 
-    event.target.value = '';
+  const handleFiles = (event) => {
+    const input = event.currentTarget;
+    addAudioFiles(input.files).finally(() => { input.value = ''; });
+  };
+
+  const hasDraggedFiles = (event) =>
+    Array.from(event.dataTransfer?.types || []).includes('Files');
+
+  const handleDragEnter = (event) => {
+    if (activeSection !== 'local' || isFullscreen || !hasDraggedFiles(event)) return;
+    event.preventDefault();
+    dragCounterRef.current += 1;
+    setIsDraggingFiles(true);
+  };
+
+  const handleDragOver = (event) => {
+    if (activeSection !== 'local' || isFullscreen || !hasDraggedFiles(event)) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+  };
+
+  const handleDragLeave = (event) => {
+    if (activeSection !== 'local' || isFullscreen || !hasDraggedFiles(event)) return;
+    event.preventDefault();
+    dragCounterRef.current = Math.max(0, dragCounterRef.current - 1);
+    if (dragCounterRef.current === 0) setIsDraggingFiles(false);
+  };
+
+  const handleDrop = (event) => {
+    if (activeSection !== 'local' || isFullscreen || !hasDraggedFiles(event)) return;
+    event.preventDefault();
+    dragCounterRef.current = 0;
+    setIsDraggingFiles(false);
+    addAudioFiles(event.dataTransfer.files);
   };
 
   useEffect(() => {
@@ -425,6 +534,7 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
         audio?.load();
 
         URL.revokeObjectURL(removedSong.url);
+        if (removedSong.artwork?.startsWith('blob:')) URL.revokeObjectURL(removedSong.artwork);
 
         setSongs([]);
         setCurrentIndex(0);
@@ -437,6 +547,7 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
       const nextIndex = index === songs.length - 1 ? index - 1 : index;
 
       URL.revokeObjectURL(removedSong.url);
+      if (removedSong.artwork?.startsWith('blob:')) URL.revokeObjectURL(removedSong.artwork);
       shouldAutoPlayRef.current = true;
 
       setSongs(previous => previous.filter((_, i) => i !== index));
@@ -445,6 +556,7 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
     }
 
     URL.revokeObjectURL(removedSong.url);
+    if (removedSong.artwork?.startsWith('blob:')) URL.revokeObjectURL(removedSong.artwork);
 
     setSongs(previous => previous.filter((_, i) => i !== index));
 
@@ -546,7 +658,10 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
 
   useEffect(() => {
     return () => {
-      songsRef.current.forEach(song => URL.revokeObjectURL(song.url));
+      songsRef.current.forEach(song => {
+        URL.revokeObjectURL(song.url);
+        if (song.artwork?.startsWith('blob:')) URL.revokeObjectURL(song.artwork);
+      });
     };
   }, []);
 
@@ -654,7 +769,7 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
           onClick={() => playSong(song.originalIndex)}
           title={`${tr('play', 'Reproducir', 'Play')} ${song.name}`}
         >
-          <Music2 size={compact ? 16 : 19} />
+          <TrackArtwork artwork={song.artwork} className="track-artwork-row" alt={song.name} />
           <span>{song.name}</span>
         </button>
 
@@ -677,7 +792,9 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
   };
 
   const languageSelector = (
-    <div className="language-selector" aria-label="Language selector">
+    <div className="language-control">
+      <span className="language-hint">{language === 'en' ? 'CHANGE LANGUAGE HERE' : 'CAMBIÁ EL IDIOMA AQUÍ'}</span>
+      <div className="language-selector" aria-label={language === 'en' ? 'Language selector' : 'Selector de idioma'}>
       <button
         type="button"
         className={language === 'es' ? 'active' : ''}
@@ -699,13 +816,18 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
       >
         EN
       </button>
+      </div>
     </div>
   );
 
   return (
     <main
-      className={`player-layout source-${activeSection} ${isFullscreen ? 'fullscreen-active' : ''}`}
+      className={`player-layout source-${activeSection} ${isFullscreen ? 'fullscreen-active' : ''} ${isDraggingFiles ? 'files-dragging' : ''}`}
       ref={playerLayoutRef}
+      onDragEnter={handleDragEnter}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
     >
       <audio
         crossOrigin="anonymous"
@@ -723,6 +845,12 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
         multiple
         onChange={handleFiles}
       />
+
+      {isDraggingFiles && activeSection === 'local' && !isFullscreen && (
+        <div className="file-drop-overlay" role="status" aria-live="polite">
+          <div><FolderOpen size={42} /><strong>{language === 'en' ? 'Drop your music files here' : 'Soltá tus canciones aquí'}</strong><span>{language === 'en' ? 'MP3, WAV, OGG, M4A, AAC and FLAC' : 'MP3, WAV, OGG, M4A, AAC y FLAC'}</span></div>
+        </div>
+      )}
 
       <header className="player-header">
         <div className="player-header-main">
@@ -817,13 +945,17 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
           />
         )}
 
-        <div className="current-track">
-          <h2>{currentSong ? currentSong.name : tr('nothingPlaying', 'Nada reproduciéndose', 'Nothing playing')}</h2>
-          <p>
-            {currentSong
-              ? (currentSong.artist || tr('nowPlaying', 'Reproduciendo ahora', 'Now playing'))
-              : tr('selectSong', 'Seleccioná una canción para comenzar', 'Select a song to get started')}
-          </p>
+        <div className={`current-track ${currentSong ? 'has-current-song' : ''}`}>
+          {currentSong && <TrackArtwork artwork={currentSong.artwork} className="track-artwork-current" alt={currentSong.name} />}
+          <div className="current-track-copy">
+            <h2>{currentSong ? currentSong.name : tr('nothingPlaying', 'Nada reproduciéndose', 'Nothing playing')}</h2>
+            <p>
+              {currentSong
+                ? (currentSong.artist || tr('nowPlaying', 'Reproduciendo ahora', 'Now playing'))
+                : tr('selectSong', 'Seleccioná una canción para comenzar', 'Select a song to get started')}
+            </p>
+            {currentSong && isPlaying && <span className="current-track-playing"><Music2 size={13} /> {tr('playing', 'REPRODUCIENDO', 'PLAYING')}</span>}
+          </div>
         </div>
 
         <div className="track-progress">
@@ -892,6 +1024,11 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
           <span>{songs.length} {tr('tracks', 'canciones', 'tracks')}</span>
         </div>
 
+        <p className="local-drop-hint">
+          {language === 'en'
+            ? 'Add MP3s with the button or drag them here. Embedded album artwork will appear automatically.'
+            : 'Agregá MP3 con el botón o arrastralos directamente aquí. Si tienen portada incorporada, EchoPulse la mostrará.'}
+        </p>
         <div className="library-toolbar">
           <button className="add-music-button" onClick={openFilePicker}>
             <FolderOpen size={19} />
@@ -992,7 +1129,9 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
               </span>
 
               <div className="fullscreen-track-icon">
-                <Music2 size={35} />
+                {currentSong
+                  ? <TrackArtwork artwork={currentSong.artwork} className="track-artwork-fullscreen" alt={currentSong.name} />
+                  : <Music2 size={35} />}
               </div>
 
               <h2>{currentSong ? currentSong.name : tr('nothingPlaying', 'Nada reproduciéndose', 'Nothing playing')}</h2>

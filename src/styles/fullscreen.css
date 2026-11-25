@@ -1958,3 +1958,41 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* En pantalla completa la portada conserva el formato cuadrado del arte. */
+.fullscreen-track-icon:has(.track-artwork) {
+  width: 84px;
+  height: 84px;
+  margin: 22px 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.fullscreen-track-icon:has(.track-artwork) .track-artwork {
+  display: grid;
+}
+
+@media (max-width: 600px) {
+  .fullscreen-track-icon:has(.track-artwork) {
+    width: 52px;
+    height: 52px;
+  }
+  .fullscreen-track-icon:has(.track-artwork) .track-artwork-fullscreen {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+  }
+}
+@media (max-width: 380px) {
+  .fullscreen-track-icon:has(.track-artwork) {
+    width: 46px;
+    height: 46px;
+  }
+  .fullscreen-track-icon:has(.track-artwork) .track-artwork-fullscreen {
+    width: 46px;
+    height: 46px;
+    border-radius: 11px;
+  }
+}

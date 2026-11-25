@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Compass, Disc3, Headphones, LoaderCircle, Music2, Play, Search, Sparkles } from 'lucide-react';
+import { Compass, Disc3, Headphones, LoaderCircle, Play, Search, Sparkles } from 'lucide-react';
 import { getAudiusTrending, normalizeAudiusTrack, searchAudiusTracks } from '../services/audius';
+import TrackArtwork from './TrackArtwork';
 import '../styles/audius-explorer.css';
 
 function AudiusExplorer({ language = 'es', onPlayTrack }) {
@@ -97,7 +98,7 @@ function AudiusExplorer({ language = 'es', onPlayTrack }) {
           {tracks.map((track, index) => (
             <article className="audius-track-card" key={track.id}>
               <button className="audius-track-art" type="button" onClick={() => handlePlay(track)} aria-label={`${copy.play}: ${track.name}`}>
-                {track.artwork ? <img src={track.artwork} alt="" loading="lazy" /> : <span className="audius-art-fallback"><Music2 size={30} /></span>}
+                <TrackArtwork artwork={track.artwork} className="track-artwork-card" alt={track.name} />
                 <span className="audius-art-play"><Play size={21} fill="currentColor" /></span>
               </button>
               <div className="audius-track-meta">

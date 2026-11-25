@@ -17,10 +17,13 @@ function SourceSelection({ language = 'es', onLanguageChange = () => {}, onSelec
           <span>EchoPulse</span>
         </div>
 
-        <div className="source-selection-language" aria-label={isEnglish ? 'Language' : 'Idioma'}>
+        <div className="source-selection-language-control">
+          <span className="source-selection-language-hint">{isEnglish ? 'CHANGE LANGUAGE HERE' : 'CAMBIÁ EL IDIOMA AQUÍ'}</span>
+          <div className="source-selection-language" aria-label={isEnglish ? 'Language' : 'Idioma'}>
           <button type="button" className={!isEnglish ? 'active' : ''} onClick={() => onLanguageChange('es')} aria-pressed={!isEnglish}>ES</button>
           <span>/</span>
           <button type="button" className={isEnglish ? 'active' : ''} onClick={() => onLanguageChange('en')} aria-pressed={isEnglish}>EN</button>
+          </div>
         </div>
       </header>
 
