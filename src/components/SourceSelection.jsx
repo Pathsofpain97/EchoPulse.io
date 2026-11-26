@@ -1,4 +1,4 @@
-import { Compass, FolderOpen, Music2 } from 'lucide-react';
+import { ChevronDown, Compass, FolderOpen, Music2 } from 'lucide-react';
 import echoPulseLogo from '../assets/EchoPulse.png';
 import '../styles/source-selection.css';
 
@@ -19,10 +19,11 @@ function SourceSelection({ language = 'es', onLanguageChange = () => {}, onSelec
 
         <div className="source-selection-language-control">
           <span className="source-selection-language-hint">{isEnglish ? 'CHANGE LANGUAGE HERE' : 'CAMBIÁ EL IDIOMA AQUÍ'}</span>
-          <div className="source-selection-language" aria-label={isEnglish ? 'Language' : 'Idioma'}>
-          <button type="button" className={!isEnglish ? 'active' : ''} onClick={() => onLanguageChange('es')} aria-pressed={!isEnglish}>ES</button>
+          <ChevronDown className="source-selection-language-arrow" size={15} aria-hidden="true" />
+          <div className="source-selection-language" aria-label={isEnglish ? 'Language' : 'Idioma'} data-lang={language}>
+          <button type="button" className={`lang-btn-es ${!isEnglish ? 'active' : ''}`} onClick={() => onLanguageChange('es')} aria-pressed={!isEnglish}>ES</button>
           <span>/</span>
-          <button type="button" className={isEnglish ? 'active' : ''} onClick={() => onLanguageChange('en')} aria-pressed={isEnglish}>EN</button>
+          <button type="button" className={`lang-btn-en ${isEnglish ? 'active' : ''}`} onClick={() => onLanguageChange('en')} aria-pressed={isEnglish}>EN</button>
           </div>
         </div>
       </header>
@@ -45,7 +46,7 @@ function SourceSelection({ language = 'es', onLanguageChange = () => {}, onSelec
             <span className="source-option-icon"><Compass size={32} /></span>
             <span className="source-option-title">{isEnglish ? 'Discover music' : 'Explorar música'}</span>
             <span className="source-option-description">
-              {isEnglish ? 'Explore music from the Audius catalog.' : 'Explorá música del catálogo de Audius.'}
+              {isEnglish ? 'Explore the Audius catalog, discover new artists, and stream music instantly, right from EchoPulse.' : 'Explorá el catálogo de Audius, descubrí nuevos artistas y escuchá música al instante, directamente desde EchoPulse.'}
             </span>
             <span className="source-option-action">{isEnglish ? 'EXPLORE MUSIC' : 'EXPLORAR MÚSICA'}</span>
           </button>

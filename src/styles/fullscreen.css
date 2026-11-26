@@ -1996,3 +1996,843 @@
     border-radius: 11px;
   }
 }
+
+/* =========================================================
+   ECHOPULSE - MOBILE FULLSCREEN CLEAN LAYOUT
+   Mantiene la experiencia de escritorio y libera espacio
+   en teléfonos para el visualizador y los controles.
+========================================================= */
+@media (max-width: 700px) {
+  /* En celular el idioma se conserva desde el modo normal;
+     la barra fullscreen queda dedicada a marca y salida. */
+  .fullscreen-topbar-actions .language-control,
+  .fullscreen-topbar-actions .language-selector,
+  .fullscreen-topbar-actions .fullscreen-library-toggle {
+    display: none !important;
+  }
+
+  .fullscreen-topbar {
+    justify-content: space-between;
+  }
+
+  .fullscreen-main {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 8px;
+    padding-top: 50px;
+  }
+
+  .fullscreen-now-playing {
+    display: grid;
+    grid-template-columns: 46px minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    align-items: center;
+    column-gap: 11px;
+    row-gap: 2px;
+    min-width: 0;
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid rgba(126, 117, 255, 0.18);
+    border-radius: 12px;
+    background: rgba(12, 15, 34, 0.58);
+  }
+
+  .fullscreen-now-playing .fullscreen-eyebrow {
+    display: none;
+  }
+
+  .fullscreen-track-icon,
+  .fullscreen-track-icon:has(.track-artwork) {
+    grid-column: 1;
+    grid-row: 1 / 4;
+    width: 46px;
+    height: 46px;
+    margin: 0;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .fullscreen-track-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .fullscreen-track-icon:has(.track-artwork) .track-artwork-fullscreen {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+  }
+
+  .fullscreen-now-playing h2 {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    font-size: clamp(11px, 3.2vw, 14px);
+    line-height: 1.25;
+  }
+
+  .fullscreen-now-playing p {
+    grid-column: 2;
+    grid-row: 2;
+    min-width: 0;
+    margin: 1px 0 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 10px;
+    line-height: 1.25;
+  }
+
+  .fullscreen-track-status {
+    display: flex;
+    grid-column: 2;
+    grid-row: 3;
+    min-width: 0;
+    margin-top: 3px;
+    font-size: 8px;
+    letter-spacing: .12em;
+  }
+
+  .fullscreen-track-status span {
+    width: 6px;
+    height: 6px;
+  }
+
+  .fullscreen-experience.controls-visible .fullscreen-main {
+    padding-bottom: 0;
+  }
+
+  .fullscreen-controls {
+    max-height: min(39dvh, 285px);
+  }
+}
+
+@media (max-width: 400px) {
+  .fullscreen-now-playing {
+    grid-template-columns: 42px minmax(0, 1fr);
+    column-gap: 9px;
+    padding: 7px 8px;
+  }
+
+  .fullscreen-track-icon,
+  .fullscreen-track-icon:has(.track-artwork),
+  .fullscreen-track-icon:has(.track-artwork) .track-artwork-fullscreen {
+    width: 42px;
+    height: 42px;
+  }
+
+  .fullscreen-now-playing h2 {
+    font-size: 11px;
+  }
+
+  .fullscreen-now-playing p {
+    font-size: 9px;
+  }
+}
+
+/* En teléfonos apaisados también usamos la composición apilada:
+   evita una columna lateral demasiado estrecha. */
+@media (min-width: 701px) and (max-width: 900px) and (orientation: landscape) {
+  .fullscreen-topbar-actions .language-control,
+  .fullscreen-topbar-actions .language-selector,
+  .fullscreen-topbar-actions .fullscreen-library-toggle {
+    display: none !important;
+  }
+
+  .fullscreen-main {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 6px;
+    padding-top: 48px;
+    padding-bottom: 0;
+  }
+
+  .fullscreen-experience.controls-visible .fullscreen-main {
+    padding-bottom: 0;
+  }
+
+  .fullscreen-now-playing {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    align-items: center;
+    column-gap: 10px;
+    row-gap: 1px;
+    padding: 5px 9px;
+    border: 1px solid rgba(126, 117, 255, 0.18);
+    border-radius: 10px;
+    background: rgba(12, 15, 34, 0.58);
+  }
+
+  .fullscreen-now-playing .fullscreen-eyebrow { display: none; }
+  .fullscreen-track-icon,
+  .fullscreen-track-icon:has(.track-artwork) {
+    grid-column: 1;
+    grid-row: 1 / 4;
+    width: 42px;
+    height: 42px;
+    margin: 0;
+    border-radius: 9px;
+    overflow: hidden;
+  }
+  .fullscreen-track-icon:has(.track-artwork) .track-artwork-fullscreen {
+    width: 42px;
+    height: 42px;
+  }
+  .fullscreen-now-playing h2 {
+    grid-column: 2;
+    grid-row: 1;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    min-width: 0;
+    font-size: 12px;
+    line-height: 1.2;
+  }
+  .fullscreen-now-playing p {
+    grid-column: 2;
+    grid-row: 2;
+    margin: 1px 0 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 9px;
+  }
+  .fullscreen-track-status {
+    display: flex;
+    grid-column: 2;
+    grid-row: 3;
+    margin-top: 2px;
+    font-size: 7px;
+  }
+  .fullscreen-controls {
+    max-height: 34dvh;
+    padding: 8px 12px;
+    gap: 7px;
+  }
+  .fullscreen-equalizer { max-height: 82px; }
+}
+
+/* =========================================================
+   ECHOPULSE - CELULAR APAISADO EN PANTALLA COMPLETA
+
+/* =========================================================
+   ECHOPULSE - PANTALLA COMPLETA EN CELULAR HORIZONTAL
+   Mantiene la misma arquitectura y estética de escritorio:
+   - Visualizador + selector de modos a la izquierda
+   - Reproduciendo ahora a la derecha
+   - Barra inferior con Reproducción (izq) + Ecualizador (der)
+========================================================= */
+
+@media (min-width: 951px) {
+  .fullscreen-topbar-actions .language-control {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    min-width: 112px;
+    height: 38px;
+    margin: 0;
+    padding: 0;
+    transform: none;
+  }
+
+  .fullscreen-topbar-actions .language-hint {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 12px);
+    width: max-content;
+    max-width: 180px;
+    transform: translateX(-50%);
+    text-align: center;
+    line-height: 1;
+  }
+
+  .fullscreen-topbar-actions .language-hint-arrow {
+    display: block;
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 1px);
+    width: 12px;
+    height: 12px;
+    margin-left: -6px;
+    transform: none;
+  }
+
+  .fullscreen-topbar-actions .language-selector {
+    height: 38px;
+    margin: 0;
+  }
+}
+
+.player-header > .language-control {
+  position: static;
+  left: auto;
+  top: auto;
+  transform: none;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  max-width: none;
+  margin: 0 0 0 auto;
+  z-index: auto;
+}
+
+@media (max-width: 600px) {
+  .player-header > .language-control {
+    max-width: 46%;
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 950px) and (max-height: 520px) and (orientation: landscape) {
+  .player-layout:fullscreen,
+  .player-layout:fullscreen .fullscreen-experience {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    max-width: none;
+    max-height: none;
+    overflow: hidden;
+  }
+
+  .fullscreen-experience {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    padding: max(6px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  }
+
+  .fullscreen-topbar {
+    position: absolute;
+    top: max(6px, env(safe-area-inset-top));
+    left: max(12px, env(safe-area-inset-left));
+    right: max(12px, env(safe-area-inset-right));
+    min-height: 30px;
+    z-index: 30;
+  }
+
+  .fullscreen-brand {
+    gap: 7px;
+    font-size: 13px;
+  }
+
+  .fullscreen-brand svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .fullscreen-exit {
+    width: 30px;
+    height: 30px;
+  }
+
+  .fullscreen-topbar-actions .language-control,
+  .fullscreen-topbar-actions .language-selector,
+  .fullscreen-topbar-actions .fullscreen-library-toggle {
+    display: none !important;
+  }
+
+  /* Zona principal idéntica a desktop: visualizador (izq) + track info (der) */
+  .fullscreen-main,
+  .fullscreen-experience.controls-visible .fullscreen-main {
+    display: grid;
+    flex: 1 1 0;
+    grid-template-columns: minmax(0, 1fr) minmax(150px, 27%);
+    grid-template-rows: minmax(0, 1fr);
+    align-items: stretch;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 36px 0 112px;
+    overflow: hidden;
+  }
+
+  .fullscreen-visualizer {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: stretch;
+    gap: 6px;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .fullscreen-visualizer > .visualizer-stage {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    width: 100%;
+    height: auto;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .fullscreen-visualizer > .visualizer-stage canvas {
+    display: block;
+    flex: 1 1 0;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .fullscreen-visualizer .visualizer-footer {
+    padding: 3px 4px 0;
+    font-size: 8px;
+    line-height: 1.1;
+  }
+
+  /* Tarjeta de modos compacta y completa sin recortes */
+  .fullscreen-visualizer > .visualizer-mode-card {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
+    width: 100%;
+    max-height: none;
+    min-height: 0;
+    margin: 0;
+    padding: 5px 8px;
+    border-radius: 10px;
+    overflow: visible;
+  }
+
+  .fullscreen-visualizer > .visualizer-mode-card .visualizer-mode-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    margin: 0 0 4px;
+  }
+
+  .fullscreen-visualizer > .visualizer-mode-card .visualizer-mode-eyebrow {
+    display: none;
+  }
+
+  .fullscreen-visualizer > .visualizer-mode-card .visualizer-mode-card-header h3 {
+    margin: 0;
+    font-size: 9.5px;
+    line-height: 1.1;
+  }
+
+  .fullscreen-visualizer > .visualizer-mode-card .visualizer-mode-current {
+    max-width: 45%;
+    padding: 2px 6px;
+    font-size: 7.5px;
+  }
+
+  .fullscreen-visualizer > .visualizer-mode-card .visualizer-modes {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(20px, auto));
+    gap: 4px;
+    width: 100%;
+  }
+
+  .fullscreen-visualizer > .visualizer-mode-card .visualizer-modes button {
+    min-width: 0;
+    height: auto;
+    min-height: 20px;
+    padding: 2px 4px;
+    overflow: hidden;
+    font-size: 7.5px;
+    line-height: 1.05;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  /* Panel derecho (Now Playing): conserva estética exacta de escritorio */
+  .fullscreen-now-playing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 6px 6px 6px 12px;
+    overflow: hidden;
+    text-align: center;
+    border: 0;
+    border-left: 1px solid rgba(126, 117, 255, 0.22);
+  }
+
+  .fullscreen-now-playing .fullscreen-eyebrow {
+    margin: 0 0 6px;
+    font-size: 7.5px;
+    letter-spacing: 0.14em;
+  }
+
+  .fullscreen-track-icon,
+  .fullscreen-track-icon:has(.track-artwork) {
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    margin: 2px 0 6px;
+    overflow: hidden;
+    border-radius: 11px;
+  }
+
+  .fullscreen-track-icon:has(.track-artwork) .track-artwork-fullscreen {
+    width: 100%;
+    height: 100%;
+    border-radius: 11px;
+  }
+
+  .fullscreen-now-playing h2 {
+    display: -webkit-box;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    font-size: 11px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .fullscreen-now-playing p {
+    width: 100%;
+    margin: 4px 0 6px;
+    overflow: hidden;
+    font-size: 8.5px;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .fullscreen-track-status {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    font-size: 7.5px;
+    letter-spacing: 0.1em;
+  }
+
+  .fullscreen-track-status span {
+    width: 6px;
+    height: 6px;
+  }
+
+  /* Barra inferior flotante: Reproducción (izq) + Ecualizador (der) */
+  .fullscreen-controls {
+    position: absolute;
+    left: max(12px, env(safe-area-inset-left));
+    right: max(12px, env(safe-area-inset-right));
+    bottom: max(6px, env(safe-area-inset-bottom));
+    display: grid;
+    grid-template-columns: minmax(195px, 0.78fr) minmax(0, 1.22fr);
+    grid-template-rows: minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    height: 98px;
+    min-height: 98px;
+    max-height: 98px;
+    margin: 0;
+    padding: 8px 12px;
+    border-radius: 13px;
+    overflow: hidden;
+  }
+
+  .fullscreen-playback {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .fullscreen-progress {
+    display: grid;
+    grid-template-columns: 28px minmax(0, 1fr) 28px;
+    gap: 5px;
+    font-size: 8px;
+  }
+
+  .fullscreen-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .fullscreen-buttons button {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+  }
+
+  .fullscreen-buttons button svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .fullscreen-buttons .fullscreen-play-button {
+    width: 36px;
+    height: 36px;
+  }
+
+  .fullscreen-buttons .fullscreen-play-button svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .fullscreen-volume {
+    width: clamp(50px, 9vw, 72px);
+    gap: 4px;
+    margin-left: 2px;
+  }
+
+  .fullscreen-volume svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Ecualizador: igual que en desktop (scroll interno suave y sin aplastarse) */
+  .fullscreen-equalizer {
+    width: 100%;
+    height: 82px;
+    min-width: 0;
+    min-height: 0;
+    max-height: 82px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(53, 231, 242, 0.35) transparent;
+  }
+
+  .fullscreen-equalizer .equalizer-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 7px 9px;
+    overflow: visible;
+  }
+
+  .fullscreen-equalizer .equalizer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 0;
+    height: auto;
+    margin: 0;
+  }
+
+  .fullscreen-equalizer .equalizer-title {
+    gap: 5px;
+  }
+
+  .fullscreen-equalizer .equalizer-title h2 {
+    margin: 0;
+    font-size: 10px;
+  }
+
+  .fullscreen-equalizer .equalizer-title svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .fullscreen-equalizer .equalizer-reset {
+    min-height: 20px;
+    padding: 2px 7px;
+    font-size: 8px;
+  }
+
+  .fullscreen-equalizer .equalizer-presets-card {
+    display: block;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 5px 6px;
+    overflow: visible;
+  }
+
+  .fullscreen-equalizer .equalizer-presets-heading {
+    margin: 0 0 4px;
+    font-size: 7px;
+    line-height: 1.1;
+  }
+
+  .fullscreen-equalizer .equalizer-presets {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 4px;
+    height: auto;
+    margin: 0;
+  }
+
+  .fullscreen-equalizer .equalizer-presets button {
+    min-width: 0;
+    min-height: 22px;
+    height: auto;
+    padding: 3px 2px;
+    font-size: 7.5px;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .fullscreen-equalizer .equalizer-sliders {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: center;
+    gap: 4px;
+    height: auto;
+    min-height: 0;
+    padding: 4px 0 2px;
+    margin: 0;
+  }
+
+  .fullscreen-equalizer .equalizer-band {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: auto;
+    min-width: 0;
+    overflow: visible;
+  }
+
+  .fullscreen-equalizer .equalizer-value {
+    font-size: 8px;
+    line-height: 1;
+  }
+
+  .fullscreen-equalizer .equalizer-band input {
+    width: 48px;
+    max-width: 48px;
+    height: 5px;
+    min-height: 5px;
+    margin: 20px 0;
+    transform: rotate(-90deg);
+    transform-origin: center;
+  }
+
+  .fullscreen-equalizer .equalizer-band-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+  }
+
+  .fullscreen-equalizer .equalizer-band-info strong {
+    max-width: 100%;
+    font-size: 8px;
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .fullscreen-equalizer .equalizer-band-info span {
+    display: block;
+    font-size: 7px;
+    line-height: 1.1;
+  }
+
+  .fullscreen-equalizer .equalizer-band-info p {
+    display: none;
+  }
+
+  .fullscreen-hint {
+    top: 34px;
+    font-size: 8px;
+  }
+
+  /* Cuando los controles se ocultan por inactividad, el visualizador ocupa toda la pantalla */
+  .fullscreen-experience:not(.controls-visible) .fullscreen-main {
+    grid-template-columns: minmax(0, 1fr);
+    padding-bottom: 8px;
+  }
+
+  .fullscreen-experience:not(.controls-visible) .fullscreen-now-playing,
+  .fullscreen-experience:not(.controls-visible) .fullscreen-visualizer > .visualizer-mode-card {
+    display: none;
+  }
+}
+
+
+/* =========================================================
+   ESCRITORIO (min-width: 951px): LEGIBILIDAD Y ESTÉTICA
+   No altera reglas de celular vertical ni apaisado.
+========================================================= */
+@media (min-width: 951px) {
+  .fullscreen-brand {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.9px;
+  }
+
+  .fullscreen-eyebrow {
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .fullscreen-now-playing h2 {
+    font-size: clamp(19px, 1.8vw, 24px);
+  }
+
+  .fullscreen-now-playing p {
+    font-size: 14px;
+  }
+
+  .fullscreen-visualizer > .visualizer-mode-card .visualizer-mode-card-header h3 {
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .fullscreen-visualizer > .visualizer-mode-card .visualizer-mode-current {
+    font-size: 11px;
+  }
+
+  .fullscreen-visualizer > .visualizer-mode-card .visualizer-modes button {
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+
+  .fullscreen-equalizer .equalizer-title h2 {
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .fullscreen-equalizer .equalizer-presets button,
+  .fullscreen-equalizer .equalizer-reset,
+  .fullscreen-equalizer .equalizer-value,
+  .fullscreen-equalizer .equalizer-band-info strong {
+    font-size: 12px;
+  }
+
+  .fullscreen-equalizer .equalizer-band-info span {
+    font-size: 11px;
+  }
+}

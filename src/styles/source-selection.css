@@ -52,18 +52,61 @@
   background: rgba(53, 231, 242, .08);
   box-shadow: 0 0 24px rgba(53, 231, 242, .12);
 }
-.source-selection-language { gap: 9px; color: #737b9c; font-size: 12px; }
+.source-selection-language {
+  gap: 5px;
+  padding: 4px;
+  color: #737b9c;
+  font-size: 11px;
+  background: rgba(12, 18, 38, 0.92);
+  border: 1px solid rgba(53, 231, 242, 0.22);
+  border-radius: 999px;
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.2),
+    inset 0 0 12px rgba(53, 231, 242, 0.025);
+}
 .source-selection-language button {
-  padding: 7px 8px;
+  padding: 6px 12px;
   color: #8f96b2;
-  border: 0;
-  border-radius: 7px;
+  border: 1px solid transparent;
+  border-radius: 999px;
   background: transparent;
   font: inherit;
   font-weight: 800;
+  letter-spacing: 0.7px;
   cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
-.source-selection-language button.active { color: var(--source-cyan); background: rgba(53, 231, 242, .09); }
+.source-selection-language button:hover {
+  color: #ffffff;
+  background: rgba(53, 231, 242, 0.08);
+}
+.source-selection-language button:active {
+  background: rgba(53, 231, 242, 0.22);
+  border-color: rgba(53, 231, 242, 0.45);
+}
+.source-selection-language button.lang-btn-es.active {
+  color: #35e7f2;
+  background: linear-gradient(135deg, rgba(53, 231, 242, 0.22), rgba(53, 231, 242, 0.07));
+  border-color: rgba(53, 231, 242, 0.62);
+  box-shadow:
+    0 0 16px rgba(53, 231, 242, 0.28),
+    inset 0 0 10px rgba(53, 231, 242, 0.12);
+}
+.source-selection-language button.lang-btn-en.active {
+  color: #cfaeff;
+  background: linear-gradient(135deg, rgba(153, 92, 255, 0.28), rgba(183, 138, 255, 0.1));
+  border-color: rgba(183, 138, 255, 0.65);
+  box-shadow:
+    0 0 16px rgba(153, 92, 255, 0.32),
+    inset 0 0 10px rgba(183, 138, 255, 0.14);
+}
+.source-selection-language button.active:active {
+  filter: brightness(1.18);
+}
 
 .source-selection-content {
   width: min(900px, 100%);
@@ -264,4 +307,81 @@
 }
 @media (max-width: 380px) {
   .source-selection-content h1 { font-size: 29px; }
+}
+
+
+/* Ajustes de accesibilidad y guía visual del selector de idioma. */
+.source-selection-language-control {
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  text-align: center;
+}
+.source-selection-language-hint {
+  font-size: 9px;
+  letter-spacing: .9px;
+  text-align: center;
+}
+.source-selection-language-arrow {
+  color: var(--source-cyan);
+  opacity: .9;
+  filter: drop-shadow(0 0 5px rgba(53, 231, 242, .35));
+  animation: language-arrow-nudge 1.8s ease-in-out infinite;
+}
+@keyframes language-arrow-nudge {
+  0%, 100% { transform: translateY(0); opacity: .7; }
+  50% { transform: translateY(3px); opacity: 1; }
+}
+
+/* Textos más claros y legibles en la pantalla de bienvenida. */
+.source-selection-content h1 {
+  font-size: clamp(34px, 5.4vw, 54px);
+  line-height: 1.16;
+  text-shadow: 0 2px 24px rgba(53, 231, 242, .12);
+}
+.source-selection-description {
+  max-width: 620px;
+  color: #c0c8df;
+  font-size: 17px;
+  line-height: 1.7;
+}
+.source-selection-mode-hint {
+  color: #e0e6fa;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.source-option-title {
+  font-size: clamp(23px, 2.2vw, 27px);
+}
+.source-option-description {
+  max-width: 100%;
+  color: #c0c8df;
+  font-size: 15px;
+  line-height: 1.65;
+}
+.source-selection-footnote {
+  color: #b4bfd9;
+  font-size: 13px;
+  line-height: 1.65;
+}
+@media (max-width: 620px) {
+  .source-selection-header { align-items: flex-start; }
+  .source-selection-language-control { min-width: 122px; }
+  .source-selection-language-hint { font-size: 8px; letter-spacing: .55px; }
+  .source-selection-content { padding: 35px 0 25px; }
+  .source-selection-content h1 { font-size: clamp(30px, 8vw, 39px); line-height: 1.2; }
+  .source-selection-description { font-size: 15px; line-height: 1.6; }
+  .source-selection-mode-hint { margin-top: 23px; font-size: 13px; }
+  .source-option-title { font-size: 22px; }
+  .source-option-description { font-size: 14px; line-height: 1.55; }
+  .source-selection-footnote { font-size: 12px; line-height: 1.6; }
+}
+@media (max-width: 380px) {
+  .source-selection-language-control { min-width: 108px; }
+  .source-selection-language-hint { font-size: 7px; letter-spacing: .35px; }
+  .source-selection-content h1 { font-size: 29px; }
+  .source-selection-description { font-size: 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .source-selection-language-arrow { animation: none; }
 }

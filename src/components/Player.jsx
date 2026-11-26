@@ -14,7 +14,8 @@ import {
   Maximize,
   X,
   Search,
-  Compass
+  Compass,
+  ChevronDown
 } from 'lucide-react';
 
 import Visualizer, { VisualizerModeSelector } from './Visualizer';
@@ -794,10 +795,11 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
   const languageSelector = (
     <div className="language-control">
       <span className="language-hint">{language === 'en' ? 'CHANGE LANGUAGE HERE' : 'CAMBIÁ EL IDIOMA AQUÍ'}</span>
-      <div className="language-selector" aria-label={language === 'en' ? 'Language selector' : 'Selector de idioma'}>
+      <ChevronDown className="language-hint-arrow" size={13} aria-hidden="true" />
+      <div className="language-selector" aria-label={language === 'en' ? 'Language selector' : 'Selector de idioma'} data-lang={language}>
       <button
         type="button"
-        className={language === 'es' ? 'active' : ''}
+        className={`lang-btn-es ${language === 'es' ? 'active' : ''}`}
         onClick={() => onLanguageChange('es')}
         aria-pressed={language === 'es'}
         title="Español"
@@ -809,7 +811,7 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
 
       <button
         type="button"
-        className={language === 'en' ? 'active' : ''}
+        className={`lang-btn-en ${language === 'en' ? 'active' : ''}`}
         onClick={() => onLanguageChange('en')}
         aria-pressed={language === 'en'}
         title="English"
@@ -945,7 +947,7 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
           />
         )}
 
-        <div className={`current-track ${currentSong ? 'has-current-song' : ''}`}>
+        <div className={`current-track ${currentSong ? 'has-current-song' : 'current-track-empty'}`}>
           {currentSong && <TrackArtwork artwork={currentSong.artwork} className="track-artwork-current" alt={currentSong.name} />}
           <div className="current-track-copy">
             <h2>{currentSong ? currentSong.name : tr('nothingPlaying', 'Nada reproduciéndose', 'Nothing playing')}</h2>
@@ -1026,8 +1028,8 @@ function Player({ language = 'es', onLanguageChange = () => {}, initialSection =
 
         <p className="local-drop-hint">
           {language === 'en'
-            ? 'Add MP3s with the button or drag them here. Embedded album artwork will appear automatically.'
-            : 'Agregá MP3 con el botón o arrastralos directamente aquí. Si tienen portada incorporada, EchoPulse la mostrará.'}
+            ? 'Add your MP3s with the button or drag them directly into this library.'
+            : 'Podés agregar tus MP3 con el botón o arrastrarlos directamente a esta biblioteca.'}
         </p>
         <div className="library-toolbar">
           <button className="add-music-button" onClick={openFilePicker}>

@@ -74,3 +74,9 @@
   border-radius: 10px;
   box-shadow: none;
 }
+
+
+/* Separación uniforme del catálogo respecto del bloque superior. */
+.audius-explorer {
+  margin-top: 18px;
+}

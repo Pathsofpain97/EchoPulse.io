@@ -44,6 +44,23 @@ function App() {
     document.documentElement.lang = language;
   }, [language]);
 
+  // Evita que el navegador abra un archivo soltado fuera de la biblioteca.
+  // El procesamiento real de archivos sigue limitado al reproductor en «Mi música».
+  useEffect(() => {
+    const preventFileNavigation = (event) => {
+      const hasFiles = Array.from(event.dataTransfer?.types || []).includes('Files');
+      if (hasFiles) event.preventDefault();
+    };
+
+    window.addEventListener('dragover', preventFileNavigation);
+    window.addEventListener('drop', preventFileNavigation);
+
+    return () => {
+      window.removeEventListener('dragover', preventFileNavigation);
+      window.removeEventListener('drop', preventFileNavigation);
+    };
+  }, []);
+
   return (
     <>
       {showIntro ? (
