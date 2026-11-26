@@ -2836,3 +2836,134 @@
     font-size: 11px;
   }
 }
+
+
+
+/* =========================================================
+   CORRECCION DEL ECUALIZADOR EN PANTALLA COMPLETA DE ESCRITORIO
+   Conserva el panel compartido original y la legibilidad existente.
+   No afecta anchos <= 950px ni el modo movil horizontal.
+========================================================= */
+@media (min-width: 951px) and (min-height: 650px) {
+  /* Reserva el alto real del panel inferior (reproducción + ecualizador)
+     para que no tape la tarjeta de modos de visualización. */
+  .fullscreen-experience.controls-visible .fullscreen-main {
+    padding-bottom: clamp(340px, calc(40vh - 10px), 400px) !important;
+  }
+
+  /* La tarjeta de modos conserva su espacio y no se comprime detrás
+     del panel flotante cuando el ecualizador necesita más altura. */
+  .fullscreen-visualizer {
+    min-height: 0;
+  }
+
+  .fullscreen-visualizer > .visualizer-mode-card {
+    flex: 0 0 auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  /* El ecualizador debe crecer con su contenido, no convertirse en un scroll. */
+  .fullscreen-controls {
+    align-items: center;
+  }
+
+  .fullscreen-equalizer {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    scrollbar-width: none;
+  }
+
+  .fullscreen-equalizer .equalizer-panel {
+    height: auto;
+    min-height: 0;
+    padding: 12px 14px 10px;
+    overflow: visible;
+  }
+
+  .fullscreen-equalizer .equalizer-header {
+    margin-bottom: 8px;
+  }
+
+  .fullscreen-equalizer .equalizer-presets-card {
+    margin-bottom: 8px;
+    padding: 8px 10px;
+  }
+
+  .fullscreen-equalizer .equalizer-presets-heading {
+    margin-bottom: 7px;
+  }
+
+  .fullscreen-equalizer .equalizer-presets {
+    gap: 6px;
+  }
+
+  .fullscreen-equalizer .equalizer-presets button {
+    min-height: 30px;
+    padding: 6px 5px;
+  }
+
+  /* Cada banda reserva altura física para el slider rotado.
+     Esto evita que la barra invada el valor o la frecuencia. */
+  .fullscreen-equalizer .equalizer-sliders {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    align-items: start;
+    gap: 8px;
+    min-height: 158px;
+    padding: 3px 0 0;
+    margin: 0;
+  }
+
+  .fullscreen-equalizer .equalizer-band {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 4px;
+    min-width: 0;
+    overflow: visible;
+  }
+
+  .fullscreen-equalizer .equalizer-value {
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  .fullscreen-equalizer .equalizer-band input {
+    display: block;
+    flex: 0 0 auto;
+    width: 100px;
+    min-width: 100px;
+    max-width: none;
+    height: 6px;
+    min-height: 6px;
+    margin: 48px 0 54px;
+    transform: rotate(-90deg);
+    transform-origin: center;
+  }
+
+  .fullscreen-equalizer .equalizer-band-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    text-align: center;
+  }
+
+  .fullscreen-equalizer .equalizer-band-info strong,
+  .fullscreen-equalizer .equalizer-band-info span {
+    display: block;
+    max-width: 100%;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .fullscreen-equalizer .equalizer-band-info p {
+    display: none;
+  }
+}

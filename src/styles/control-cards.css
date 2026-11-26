@@ -298,3 +298,48 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+
+/* Legibilidad de tarjetas en escritorio: se mantiene la estructura original. */
+@media (min-width: 951px) and (min-height: 650px) {
+  .visualizer-mode-card .visualizer-modes button {
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .fullscreen-visualizer > .visualizer-mode-card .visualizer-mode-card-header h3 {
+    font-size: 16px;
+  }
+
+  .fullscreen-visualizer > .visualizer-mode-card .visualizer-modes button {
+    min-height: 34px;
+    padding: 7px 6px;
+    font-size: 14px;
+    line-height: 1.2;
+  }
+
+  .equalizer-presets-card .equalizer-presets button {
+    min-height: 36px;
+    font-size: 12.5px;
+  }
+
+  .fullscreen-equalizer .equalizer-presets-card .equalizer-presets button {
+    min-height: 36px;
+    padding: 7px 6px;
+    font-size: 13px;
+  }
+
+  .fullscreen-equalizer .equalizer-title h2 {
+    font-size: 16px;
+  }
+
+  .fullscreen-equalizer .equalizer-reset,
+  .fullscreen-equalizer .equalizer-value,
+  .fullscreen-equalizer .equalizer-band-info strong {
+    font-size: 13px;
+  }
+
+  .fullscreen-equalizer .equalizer-band-info span {
+    font-size: 12px;
+  }
+}
